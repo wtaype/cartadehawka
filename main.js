@@ -1,9 +1,39 @@
 import $ from 'jquery';
-$(document).click(function(){
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import { auth, db } from './firebase/init.js'; // Importa la configuración de Firebase desde tu archivo de inicialización
+import { getFirestore,
+  setDoc, getDoc, deleteDoc, onSnapshot, // Lo mas usados
+  doc, collection, getDocs, serverTimestamp, // Muy utiles 
+  query, where, orderBy, limit } from "firebase/firestore";  //Para Firestore
+import { wiTema, Capi, Mensaje, Notificacion, savels, getls, removels, accederRol } from './widev.js'; //Tools geniales 
 
-alert('Hola mundo genial grrr')
+// $('body').click(function(){
+//   alert('Igual, Dios te bendiga hermano!');
+// }); 
 
-});
+$('h1').click(async function(){
+  Mensaje('Escribiendo en base de datos, espere...');
+  try {
+    const wisave = doc(db, 'publico', 'wilder');
+    await setDoc(wisave, {
+      nombre: 'Wilder',
+      apellidos: 'Taype Lapa', 
+      mensaje: 'Hola guapo hermoso Wilder, Dios te protege!',
+      creacion: serverTimestamp()
+    });
+    Mensaje('✅ Documento guardado exitosamente!');
+  }catch(e){console.error(e)}
+}); // Esto es para save - guardar el documento
 
 
-const mthemas=[{tnm:"Cielo",co:"#0EBEFF"},{tnm:"Dulce",co:"#FF5C69"},{tnm:"Paz",co:"#29C72E"},{tnm:"Mora",co:"#7000FF"},{tnm:"Futuro",co:"#21073B"}];const thcon=document.createElement('div');thcon.className='mthemes';mthemas.forEach(({tnm,co})=>{const tdv=document.createElement('div');tdv.className='tema';tdv.dataset.tema=`${tnm}|${co}`;tdv.style.background=co;tdv.onclick=()=>mithm(tdv);thcon.appendChild(tdv);});document.body.appendChild(thcon);const mithm=e=>{const [th,tco]=e.dataset.tema.split('|');document.documentElement.dataset.theme=th;(document.querySelector('meta[name="theme-color"]')||Object.assign(document.head.appendChild(document.createElement('meta')),{name:'theme-color'})).content=tco;localStorage.mtheme=e.dataset.tema;document.querySelector('.mtha')?.classList.remove('mtha');e.classList.add('mtha');};const thsved=document.querySelector(`[data-tema="${localStorage.mtheme}"]`)||thcon.firstChild;if(thsved)mithm(thsved);
+$('button').click(async function(){
+  Mensaje('Esperando un mensaje ');
+  try {
+    const wiget = doc(db, 'publico', 'wilder');
+    const busq = await getDoc(wiget);
+    if (busq.exists()){
+      const data = busq.data();
+      Mensaje(data.mensaje);
+    }
+  }catch(e){console.error(e)}
+}); // Esto es para get -consultar el documento
