@@ -1,469 +1,674 @@
 import $ from 'jquery';
-import { wiAuth } from './wiauth.js'; //Para autenticación login, registro y Restablecer
+import { wiAuth } from './wiauth.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { auth, db } from './firebase/init.js';
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, getDocs, deleteDoc, onSnapshot, collection, query, where, writeBatch, serverTimestamp, limit} from "firebase/firestore";
+import { doc, setDoc, getDocs, deleteDoc, collection, query, writeBatch, serverTimestamp, limit, where } from "firebase/firestore";
+import { wiTema, Mensaje, Notificacion, savels, getls, removels, accederRol, gosaves, getsaves, showLoading, infoo } from './widev.js';
 
-import { wiTema, Capi, Mensaje, Notificacion, savels, getls, removels, accederRol, gosaves, getsaves, adtm, infoo} from './widev.js';
-
-// 🔐 GESTIÓN DE AUTENTICACIÓN EN DASHBOARD
+// 🔐 AUTENTICACIÓN OPTIMIZADA
 onAuthStateChanged(auth, async user => {
-  if(!user) return window.location.href = '/'; // Seguridad default 
+  if(!user) return window.location.href = '/'; 
   try{
     const wi = getls('wiSmile');
-    if(wi) return smileContenido(wi); // Cache primero 
-
+    if(wi) return smileContenido(wi); 
     const busq = await getDocs(query(collection(db, 'smiles'), where('usuario', '==', user.displayName)));
-    const widt = busq.docs[0].data(); savels('wiSmile', widt, 450); smileContenido(widt); // Desde Online 
+    const widt = busq.docs[0].data(); 
+    savels('wiSmile', widt, 450); 
+    smileContenido(widt);
   }catch(e){console.error(e)}
 });
+
 $(document).on('click', '.bt_salir', async () => {
-  await signOut(auth); window.location.href = '/';   // Cierra la sesión + Envia al inicio 
-  try{localStorage.clear();}catch(_){Object.keys(localStorage).forEach(k=>localStorage.removeItem(k));} //Limpieza de localStorage
+  await signOut(auth); window.location.href = '/';
+  try{localStorage.clear();}catch(_){Object.keys(localStorage).forEach(k=>localStorage.removeItem(k));}
 });
+
+// 🧹 LIMPIAR CACHE OPTIMIZADO
 $(document).on('click','.bt_cargar',()=>{
-  const pattern=/^(im\d+|ki\d+|remote:im\d+|dirty:im\d+|dirty:ki\d+)$/;
-  Object.keys(localStorage).filter(k=>pattern.test(k)).forEach(k=>localStorage.removeItem(k));
-  Mensaje('Actualizado'); setTimeout(()=>location.reload(),800);
-}); // Actualizar la parte de imagen 
+  removels('hojasdbCache', 'cartasdbCache', 'wiSmile');
+  Mensaje('Cache limpiado'); 
+  setTimeout(()=>location.reload(),800);
+});
 
-
-// DIOS SIEMPRE ES BUENO Y YO AMO A DIOS [START]
+// 🚀 FUNCIÓN PRINCIPAL OPTIMIZADA
 function smileContenido(wi){
   console.log(wi.nombre);
-  Mensaje('Bienvenido ' + wi.nombre + '!');
-// HTML CONTENIDO [Start] 
+  Mensaje(`¡Bienvenido ${wi.nombre}!`);
+
+  // 📱 HTML COMPACTO
   $('.app').html(`
     <header class="hd">
-  <nav class="nv dfw wdp">
-  <a class="logo nv_left" href="#Logo">
-      <h1>
-          <span class="nv_titulo"><i class="fas fa-graduation-cap logo-icon"></i> wiimage</span>
-          <span class="nv_descri">| Tu pizarra personalizada con notepad y anotes en imágenes</span>
-      </h1>
-  </a>
-  <div class="logo nv_right dfw">
-      
-      <div class="witemas dpf"></div>
-      <button class="bt_cargar"><i class="fa-solid fa-arrow-rotate-right"></i></button>
-      <button class="bt_login"><i class="fas fa-user"></i> ${wi.nombre}</button>
-      <button class="bt_salir"><i class="fas fa-sign-out-alt"></i> Salir</button>
-  </div>
-  </nav>
-  </header>
+      <nav class="nv dfw wdp">
+        <a class="logo nv_left" href="#Logo">
+          <h1>
+            <span class="nv_titulo"><i class="fas fa-utensils logo-icon"></i> Cartas Hawka</span>
+            <span class="nv_descri">| Administra títulos, descripciones y precios</span>
+          </h1>
+        </a>
+        <div class="logo nv_right dfw">
+          <div class="witemas dpf"></div>
+          <button class="bt_recargar" title="Recargar datos"><i class="fa-solid fa-arrow-rotate-right"></i></button>
+          <button class="bt_login"><i class="fas fa-user"></i> ${wi.usuario}</button>
+          <button class="bt_salir"><i class="fas fa-sign-out-alt"></i> Salir</button>
+        </div>
+      </nav>
+    </header>
 
-  <main class="miwb wdp">
-  <section class="swb notas">
-    <div class="lista wbg">
-      <div class="dfw hcon dfc">
-          <h2><i class="fas fa-list"></i> Notas</h2>
-          <button class="agregar_nota"><i class="fas fa-plus"></i> Nota</button>
-      </div>
-      <div class="nts dfcc">
-          <div class="nt nt0 activa" data-ki="ki0">Nota actual</div>
-          
-      </div>
-  </div>
-  <div class="editor wbg">
-      <div class="hcon dfc">
-          <h2><i class="fas fa-edit"></i> Editor</h2> 
-          <i title="Ctrl + B" class="fas fa-bold"></i>
-          <i title="Ctrl + I" class="fas fa-italic"></i>
-          <i title="Ctrl + K" class="fas fa-underline"></i>
-          <i title="Ctrl + L" class="fas fa-list-ul"></i>
-          <i title="Ctrl + J" class="fas fa-list-ol"></i>
-          <i title="Ctrl + I" class="fa-solid fa-align-left"></i>
-          <i title="Ctrl + T" class="fa-solid fa-align-center"></i>
-          <i title="Ctrl + D" class="fa-solid fa-align-right"></i>
-          <i title="Ctrl + Z" class="fa-solid fa-rotate-left"></i>
-          <button class="limpiar_nota"><i class="fas fa-trash"></i>Eliminar</button>
-          <button class="guardar_nota"><i class="fas fa-save"></i> Guardar</button>
-      </div>
-      <div class="mcon">
-          <div class="txe" contenteditable="true" id="ki0">Ejemplo de las notas </div>
-      </div>
+    <main class="dashboard-grid">
+      <section class="section-1">
+        <div class="section-header">
+          <h2><i class="fas fa-layer-group"></i> Hojas</h2>
+          <button class="bt_add_hoja"><i class="fa fa-plus"></i> ADD</button>
+        </div>
+        <div class="hojas-list" id="hojasList"></div>
+      </section>
 
-    </div>
-    </section>
+      <section class="section-2">
+        <div class="section-header">
+          <h2><i class="fas fa-list"></i> Seleccionado: <span id="hojaSeleccionada">Hoja 1</span></h2>
+          <button class="bt_add_plato"><i class="fa fa-plus"></i> ADD</button>
+        </div>
+        <div class="platos-list" id="platosList"></div>
+      </section>
 
-  <section class="swb images psr">
-  <div class="paste wbg dfc">
-      <p>Área de Capturas.</p>
-      <p>Presiona Ctrl+V para pegar capturas de pantalla.</p> 
-      <p>Doble click para seleccionar imagen</p>
-    </div>
-    <div class="ibx">
-      <div class="bx bx1"></div><div class="bx bx2"></div><div class="bx bx3"></div><div class="bx bx4"></div>
-      <div class="bx bx5"></div><div class="bx bx6"></div><div class="bx bx7"></div><div class="bx bx8"></div>
-      <div class="bx bx9"></div><div class="bx bx10"></div><div class="bx bx11"></div><div class="bx bx12"></div>
-    </div>
+      <section class="section-3">
+        <div class="section-header">
+          <h2><i class="fas fa-edit"></i> Seleccionado: <span id="platoSeleccionado">Selecciona un plato</span></h2>
+        </div>
+        <div class="plato-editor" id="platoEditor">
+          <div class="editor-field">
+            <label>Título <span class="field-tip">Ingresa el nombre del plato</span></label>
+            <input type="text" id="editorTitulo" placeholder="Ej: CONTINENTAL" />
+          </div>
+          <div class="editor-field">
+            <label>Descripción <span class="field-tip">Detalla los ingredientes</span></label>
+            <textarea id="editorDescripcion" placeholder="Jugo de piña o papaya + pan con mantequilla..."></textarea>
+          </div>
+          <div class="editor-field">
+            <label>Precio <span class="field-tip">Solo números con decimales. Ej: 19.90</span></label>
+            <input type="number" id="editorPrecio" placeholder="19.90" min="0" step="0.01" />
+          </div>
+          <div class="editor-field">
+            <label>Orden <span class="field-tip">Orden de aparición (se asigna automáticamente)</span></label>
+            <input type="number" id="editorOrden" placeholder="1" min="0" step="1" />
+          </div>
+          <div class="editor-field">
+            <label>Estado</label>
+            <select id="editorEstado">
+              <option value="activo">Disponible</option>
+              <option value="desactivo">No disponible</option>
+            </select>
+          </div>
+          <div class="editor-actions">
+            <button class="bt_guardar_plato"><i class="fa fa-save"></i> Guardar</button>
+            <button class="bt_eliminar_plato"><i class="fa fa-trash"></i> Eliminar</button>
+          </div>
+        </div>
+      </section>
 
-      <!-- Visor fullscreen -->
-    <div class="vw" aria-hidden="true">
-      <button class="ic dw"  title="Anterior (<)"><i class="fa-solid fa-cloud-arrow-up"></i></button>
-      <button class="ic cls" title="Cerrar (Esc)"><i class="fa-solid fa-xmark"></i></button>
-      <button class="ic dl"  title="Descargar (Ctrl+S)"><i class="fa-solid fa-download"></i></button>
-      <button class="ic rm"  title="Eliminar (Supr)"><i class="fa-solid fa-trash"></i></button>
-      <button class="ic pv"  title="Anterior (<)"><i class="fa-solid fa-chevron-left"></i></button>
-      <img alt="Vista previa">
-      <button class="ic nx"  title="Siguiente (>)"><i class="fa-solid fa-chevron-right"></i></button>
-      <div class="th" aria-label="Miniaturas"></div>
-    </div>
+      <section class="section-4">
+        <div class="section-header">
+          <h2><i class="fas fa-eye"></i> Vista previa de Hoja</h2>
+        </div>
+        <div class="preview-container" id="previewContainer"></div>
+      </section>
+    </main>
 
-  <div class='abwc psa dpn dfcc'>
-    <b>Acerca de Wiimage</b>
-    <p>Wiimage es una pizarra personal con editor de notas y un gestor de imágenes tipo galería. Pega capturas con Ctrl+V o selecciona por doble clic, organízalas en cuadros y míralas en pantalla completa con miniaturas y atajos de teclado. Todo funciona en tu navegador.</p>
-    <p>Funciones destacadas:</p>
-    <ul>
-      <li>Pegar imágenes desde portapapeles (Ctrl+V) y carga por doble clic; se ubican en el siguiente cuadro libre.</li>
-      <li>Visor fullscreen con miniaturas al pie, navegación anterior/siguiente y acciones rápidas (cerrar, descargar, eliminar).</li>
-      <li>Atajos: > o Flecha Derecha (siguiente),  o Flecha Izquierda (anterior), Esc (cerrar), Ctrl+S (descargar), Supr (eliminar).</li>
-      <li>Notas con auto-guardado, chips con vista previa y herramientas de formato (negrita, listas, alineación).</li>
-      <li>Persistencia local (LocalStorage) para notas e imágenes y botón “Borrar todo”.</li>
-      <li>Diseño responsivo y temas visuales para un uso tipo app.</li>
-    </ul>
-    <p><a href='https://wtaype.github.io/wiimage/v11' target='_blank'>v11 - Version Inicial</a></p>
-    <p><a href='https://wtaype.github.io/wiimage/v12' target='_blank'>v12 - Version Blue</a></p>
-    <b>Privacidad y seguridad</b>
-    <p>Wiimage no recopila datos personales ni envía información a servidores. Todo se procesa localmente en tu dispositivo y se guarda en el almacenamiento del navegador. Puedes eliminarlo cuando quieras con “Borrar todo”. No usamos cookies de rastreo.</p>
-    <button aria-label='ENTENDIDO' class='abwok bts'>ENTENDIDO</button>
-  </div>
+    <footer class='foo hwb txc'>
+      <p>Creado con<i class="fa fa-heart"></i>by<a class='ftx lkme' href='https://wtaype.github.io/' target='_blank'>@wilder.taype</a>2025 - <span class="wty"></span><span class="abw tm11042025" id="101542394703517594">| Acerca del app | Actualizado</span><span class="wtu"></span></p>
+    </footer>
+  `); 
 
-  </section>
-
-  </main>
-
-  <footer class='foo hwb txc'>
-  <p>Creado con<i class="fa fa-heart"></i>by<a class='ftx lkme' href='https://wtaype.github.io/' target='_blank'>@wilder.taype</a>2025 - <span class="wty"></span><span class="abw tm11042025" id="101542394703517594">| Acerca del app | Actualizado</span><span class="wtu"></span></p>
-  </footer>
-    
-`); // HTML CONTENIDO [End] 
-
-// JQUERY CONTENIDO JS [Start] 
-// ...existing code...
-// NOTAS: local 12h, sync batch, live, y borrar remoto
-gosaves('.txe','id',$e=>$e.html()); getsaves('.txe','id',($e,v)=>$e.html(v));
-
-const $edt=$('.txe'), $lis=$('.nts'), $bar=$('.editor .hcon'); let cnt=0;
-const idki=s=>+String(s).replace(/\D+/g,'')||0, prev=(h,l=22)=>$('<div>').html(h||'').text().replace(/\s+/g,' ').trim().slice(0,l);
-const actv=id=>($('[data-ki^="ki"]').removeClass('activa'),$(`[data-ki="${id}"]`).addClass('activa'));
-const krem=id=>`remote:${id}`, kdir=id=>`dirty:${id}`, kils=()=>Object.keys(localStorage).filter(k=>/^ki\d+$/.test(k));
-const titl=v=>{const t=prev(v); return t?(t+'...'):'';};
-
-// Chip: texto + icono nube si está remoto
-const fich=(id,t)=>{
-  const put=$el=>{
-    $el.empty().text(t||'');
-    if(getls(krem(id))) $el.append(' ').append($('<i class="fa-solid fa-cloud-arrow-up"></i>'));
+  // ⚙️ CONFIGURACIÓN
+  const CONFIG = {
+    COL_HOJAS: 'hojasdb',
+    COL_CARTAS: 'cartasdb',
+    CACHE_HOJAS: 'hojasdbCache', 
+    CACHE_CARTAS: 'cartasdbCache',
+    CACHE_HRS: { hojas: 24, cartas: 6 }
   };
-  const $c=$(`[data-ki="${id}"]`);
-  $c.length?put($c):put($(`<div class="nt nt${idki(id)}" data-ki="${id}"></div>`).appendTo($lis));
-};
 
-const carg=id=>{const v=getls(id)||''; $edt.attr('id',id).html(v).focus(); actv(id);};
+  // 📊 ESTADO GLOBAL
+  const state = {
+    hojas: getls(CONFIG.CACHE_HOJAS) || [],
+    cartas: getls(CONFIG.CACHE_CARTAS) || [],
+    hojaActiva: 1,
+    platoActivo: null,
+    dirtyItems: { hojas: new Set(), cartas: new Set() },
+    tempCounter: 1
+  };
 
-const init=()=>{
-  const ch=$('[data-ki^="ki"]').map((i,e)=>idki($(e).data('ki'))).get();
-  const ks=kils();
-  cnt=Math.max(cnt,0,...ch,...ks.map(idki));
-  $.each(ks,(_,id)=>{const v=getls(id); v&&fich(id,titl(v));});
-};
-
-const okgd=(()=>{let t;return(ms=1600)=>{const $b=$('.guardar_nota');if(!$b.length)return;$b.addClass('bta').text('Guardado');clearTimeout(t);t=setTimeout(()=>{$b.removeClass('bta').text('Guardar');},ms);};})();
-
-// Hidratar si local vacío (máx 100)
-const hidr = async () => {
-  const u=auth.currentUser, email=u?.email; if(!email||kils().length) return;
-  try{
-    const qy=query(collection(db,'smilenotas'), where('email','==',email), limit(100));
-    const sn=await getDocs(qy); let mx=0;
-    sn.forEach(ds=>{
-      const d=ds.data(), id=d.ki||'ki0', html=d.nota||'';
-      savels(id,html,12); savels(krem(id),1,720);
-      fich(id,titl(html)); mx=Math.max(mx,idki(id));
-    });
-    cnt=Math.max(cnt,mx);
-  }catch(e){console.error('Hydrate error:',e);}
-};
-
-// Sync batch solo dirty
-const sinc = async ({silent=false}={})=>{
-  const u=auth.currentUser, email=u?.email, usuario=u?.displayName||wi?.nombre||''; if(!email) return;
-  const ids=kils().filter(id=>!!getls(kdir(id))).slice(0,100);
-  if(!ids.length){ if(!silent) Mensaje('Nada que sincronizar'); return; }
-  const bat=writeBatch(db);
-  ids.forEach(id=>{
-    const html=getls(id)||'', titulo=prev(html,22), rf=doc(db,'smilenotas',`${email}_${id}`);
-    const dt={ki:id,titulo,usuario,email,nota:html,actualizacion:serverTimestamp()};
-    if(!getls(krem(id))) dt.creacion=serverTimestamp();
-    bat.set(rf,dt,{merge:true});
-  });
-  try{
-    await bat.commit();
-    ids.forEach(id=>{savels(krem(id),1,720); removels(kdir(id)); fich(id,titl(getls(id)));});
-    if(!silent) Mensaje('Notas guardadas en la nube');
-    okgd();
-  }catch(e){console.error('Sync error:',e); if(!silent) Notificacion('Error al sincronizar notas','error');}
-};
-
-// Eliminar local + remoto
-const elim = async id=>{
-  const u=auth.currentUser, email=u?.email;
-  try{ if(email) await deleteDoc(doc(db,'smilenotas',`${email}_${id}`)); }
-  catch(e){ console.error('Delete cloud error:',e); Notificacion('No se pudo eliminar en la nube','error'); }
-  finally{
-    removels(id); removels(kdir(id)); removels(krem(id));
-    $(`[data-ki="${id}"]`).remove();
-    if($edt.attr('id')===id) $edt.removeAttr('id').empty();
-    const ks=kils().sort((a,b)=>idki(a)-idki(b)); ks.length&&carg(ks.includes('ki0')?'ki0':ks[0]);
-    Mensaje('Nota eliminada');
-  }
-};
-
-// Live updates (no pisa “dirty”)
-let unsub=null;
-const subn=()=>{
-  const u=auth.currentUser, email=u?.email; if(!email) return;
-  if(typeof unsub==='function') try{unsub();}catch(_){}
-  const qy=query(collection(db,'smilenotas'), where('email','==',email), limit(100));
-  unsub=onSnapshot(qy, sn=>{
-    let mx=cnt;
-    sn.docChanges().forEach(ch=>{
-      const d=ch.doc.data()||{}, id=d.ki||(ch.doc.id.split('_')[1]||'ki0'), html=d.nota||'';
-      if(ch.type==='removed') return; // lo maneja elim()
-      if(!getls(kdir(id))){
-        savels(id,html,12); savels(krem(id),1,720);
-        if($edt.attr('id')===id) $edt.html(html);
+  // 🛠️ UTILIDADES MODERNAS
+  const utils = {
+    fmtPrecio: p => p == null ? '0.00' : Number(p).toFixed(2),
+    getHoja: num => state.hojas.find(h => h.numero === num),
+    getPlatos: num => state.cartas.filter(c => c.hoja === num),
+    nextIds: {
+      hoja: () => `hoja_${Math.max(0, ...state.hojas.filter(h => !h.id.startsWith('temp_') && h.id.startsWith('hoja_')).map(h => parseInt(h.id.replace('hoja_', '')) || 0)) + 1}`,
+      carta: () => `carta_h${String(Math.max(0, ...state.cartas.map(d => +(d.id.match(/carta_h(\d+)/)?.[1]||0))) + 1).padStart(2,'0')}`,
+      temp: () => `temp_${state.tempCounter++}`
+    },
+    spinner: {
+      set: ($btn, active, text = 'Guardando...') => {
+        if (active) {
+          $btn.data('original', $btn.html())
+               .prop('disabled', true)
+               .addClass('spinning')
+               .html(`<i class="fa fa-spinner fa-spin"></i> ${text}`);
+        } else {
+          $btn.prop('disabled', false)
+               .removeClass('spinning')
+               .html($btn.data('original') || $btn.html());
+        }
       }
-      fich(id, titl(getls(id)||html)); mx=Math.max(mx,idki(id));
-    });
-    cnt=Math.max(cnt,mx);
-    if(!$edt.attr('id')){
-      const ks=kils().sort((a,b)=>idki(a)-idki(b));
-      ks.length&&carg(ks.includes('ki0')?'ki0':ks[0]);
     }
-  }, e=>console.error('Snapshot notas error:',e));
-};
+  };
 
-// Eventos
-$edt.on('input',()=>{
-  const id=$edt.attr('id'); if(!id) return;
-  savels(id,$edt.html(),12); savels(kdir(id),1,12);
-  fich(id, titl(getls(id)));
-  okgd();
-});
+  // 🎨 RENDERIZADORES OPTIMIZADOS
+  const render = {
+    hojas: () => {
+      const $lista = $('#hojasList');
+      const hojasOrdenadas = state.hojas.slice().sort((a,b) => (a.numero||0) - (b.numero||0));
+      
+      if (!hojasOrdenadas.length) {
+        return $lista.html('<div class="empty-state"><i class="fas fa-layer-group"></i><p>No hay hojas creadas</p></div>');
+      }
 
-$(document).on('click','.guardar_nota',async()=>{
-  const id=$edt.attr('id');
-  if(id){savels(id,$edt.html(),12); savels(kdir(id),1,12);}
-  await sinc({silent:false});
-});
+      const html = hojasOrdenadas.map(hoja => {
+        const cantidadPlatos = utils.getPlatos(hoja.numero).filter(c => c.estado === 'activo').length;
+        const clases = [
+          state.hojaActiva === hoja.numero ? 'active' : '',
+          state.dirtyItems.hojas.has(hoja.id) ? 'dirty' : '',
+          hoja.id.startsWith('temp_') ? 'temp-item' : ''
+        ].filter(Boolean).join(' ');
+        
+        return `
+          <div class="hoja-item ${clases}" data-hoja="${hoja.numero}" data-id="${hoja.id}">
+            <div class="hoja-content">
+              <div class="hoja-icon">
+                <i class="fas ${hoja.icono || 'fa-utensils'}"></i>
+              </div>
+              <div class="hoja-info">
+                <h3>Hoja ${hoja.numero}</h3>
+                <input type="text" class="hoja-titulo" value="${hoja.titulo || ''}" placeholder="Título de la hoja" data-temp-id="ht_${hoja.id}" />
+                <div class="imagen-group">
+                  <input type="url" class="hoja-imagen" value="${hoja.imagen || ''}" placeholder="https://i.postimg.cc/..." data-temp-id="hi_${hoja.id}" />
+                  <i class="fas fa-info-circle imagen-info" title="Ingresa un link de imagen válido (postimg.cc recomendado)"></i>
+                </div>
+                <div class="nota-group">
+                  <input type="text" class="hoja-nota" value="${hoja.nota || ''}" placeholder="Nota adicional (opcional)" data-temp-id="hn_${hoja.id}" />
+                  <i class="fas fa-info-circle nota-info" title="Texto que aparecerá debajo del título en el menú público"></i>
+                </div>
+                <small>${cantidadPlatos} platos activos ${hoja.id.startsWith('temp_') ? '(sin guardar)' : ''}</small>
+              </div>
+            </div>
+            <div class="hoja-actions">
+              <button class="bt_guardar_hoja" title="Guardar cambios"><i class="fa fa-save"></i></button>
+              <button class="bt_eliminar_hoja" title="Eliminar hoja"><i class="fa fa-trash"></i></button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      $lista.html(html);
+    },
 
-$(document).on('click','.agregar_nota',()=>{
-  const tot=kils().length; if(tot>=100) return Notificacion('Máximo 100 notas por usuario','warning');
-  const id=`ki${++cnt}`; fich(id,`Nota ${cnt}`); carg(id);
-});
-$(document).on('click','[data-ki^="ki"]',e=>carg($(e.currentTarget).data('ki')));
-$(document).on('click','.limpiar_nota',async function(){
-  const id=$edt.attr('id'); if(!id) return; await elim(id); adtm(this,'bta','Eliminado','Eliminar');
-});
+    platos: () => {
+      const $lista = $('#platosList');
+      const $titulo = $('#hojaSeleccionada');
+      const hoja = utils.getHoja(state.hojaActiva);
+      const platos = utils.getPlatos(state.hojaActiva).sort((a,b) => {
+        const ao = Number(a.orden||0), bo = Number(b.orden||0);
+        return ao !== bo ? ao - bo : String(a.titulo||'').localeCompare(String(b.titulo||''));
+      });
 
-// Intento silencioso al ocultar/cerrar
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') sinc({silent:true}); });
+      $titulo.text(hoja?.titulo || 'Sin título');
+      
+      if (!platos.length) {
+        return $lista.html('<div class="empty-state"><i class="fas fa-utensils"></i><p>No hay platos en esta hoja</p></div>');
+      }
 
-// Init
-(async()=>{
-  init(); await hidr(); subn();
-  const ks=kils().sort((a,b)=>idki(a)-idki(b));
-  if(ks.length && !$edt.html()) carg(ks.includes('ki0')?'ki0':ks[0]);
-})();
+      const html = platos.map(plato => {
+        const clases = [
+          state.platoActivo === plato.id ? 'active' : '',
+          state.dirtyItems.cartas.has(plato.id) ? 'dirty' : '',
+          plato.id.startsWith('temp_') ? 'temp-item' : '',
+          plato.estado === 'activo' ? 'disponible' : 'no-disponible'
+        ].filter(Boolean).join(' ');
 
-// Toolbar editor (corto)
-const CMD={'.fa-bold':'bold','.fa-italic':'italic','.fa-underline':'underline','.fa-list-ul':'insertUnorderedList','.fa-list-ol':'insertOrderedList','.fa-align-left':'justifyLeft','.fa-align-center':'justifyCenter','.fa-align-right':'justifyRight','.fa-rotate-left':'undo'};
-$.each(CMD,(sel,cmd)=>$bar.find(sel).attr('data-cmd',cmd));
-let rng=null; const ened=()=>{const s=window.getSelection(); if(!s||!s.rangeCount)return false; const n=s.anchorNode; return n&&($edt[0]===n||$.contains($edt[0],n));};
-const gsel=()=>{const s=window.getSelection(); if(s&&s.rangeCount&&ened()) rng=s.getRangeAt(0);};
-const rsel=()=>{if(!rng)return; const s=window.getSelection(); s.removeAllRanges(); s.addRange(rng);};
-const exec=c=>{if(!ened()&&rng) rsel(); document.execCommand(c,false,null); $edt.focus(); gsel(); stbr();};
-$bar.on('mousedown','i',e=>e.preventDefault()).on('click','i',function(){const c=$(this).data('cmd'); c&&exec(c);});
-const EST=[['.fa-bold','bold'],['.fa-italic','italic'],['.fa-underline','underline'],['.fa-list-ul','insertUnorderedList'],['.fa-list-ol','insertOrderedList']];
-const stbr=()=>{if(!ened()) return void $bar.find('i').removeClass('actv').addClass('is-disabled'); $bar.find('i').removeClass('is-disabled'); $.each(EST,(_,a)=>$bar.find(a[0]).toggleClass('actv',document.queryCommandState(a[1]))); const ce=document.queryCommandState('justifyCenter'), dr=document.queryCommandState('justifyRight'); $bar.find('.fa-align-center').toggleClass('actv',ce); $bar.find('.fa-align-right').toggleClass('actv',dr); $bar.find('.fa-align-left').toggleClass('actv',!ce&&!dr);};
-document.addEventListener('selectionchange',()=>{gsel(); stbr();}); $edt.on('keyup mouseup input',()=>{gsel(); stbr();}); gsel(); stbr();
+        return `
+          <div class="plato-item ${clases}" data-id="${plato.id}">
+            <div class="plato-content">
+              <div class="plato-orden">${plato.orden || 0}</div>
+              <div class="plato-info">
+                <h4>${plato.titulo || 'Sin título'} ${plato.id.startsWith('temp_') ? '(nuevo)' : ''}</h4>
+                <p>${(plato.descripcion || '').substring(0, 50)}${(plato.descripcion||'').length > 50 ? '...' : ''}</p>
+                <span class="plato-precio">S/ ${utils.fmtPrecio(plato.precio)}</span>
+              </div>
+              <div class="plato-estado">
+                <i class="fas ${plato.estado === 'activo' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      $lista.html(html);
+    },
 
-// ==============================
-// IMÁGENES: optimizadas + Firebase + Drag&Drop + Sync Manual
-// ==============================
-const $ps=$('.paste'), $bx=$('.ibx .bx'); $bx.each((i,e)=>$(e).attr('data-k',`im${i+1}`));
-const $vw=$('.vw'), $im=$('.vw img'), $th=$('.vw .th'); let ci=-1;
-const ikr=id=>`remote:${id}`, ikd=id=>`dirty:${id}`;
+    editor: () => {
+      const plato = state.platoActivo ? state.cartas.find(p => p.id === state.platoActivo) : null;
+      const $titulo = $('#platoSeleccionado');
+      
+      if (!plato) {
+        $titulo.text('Selecciona un plato para editar');
+        ['#editorTitulo', '#editorDescripcion', '#editorPrecio', '#editorOrden'].forEach(id => $(id).val(''));
+        $('#editorEstado').val('activo');
+        return;
+      }
 
-// Optimizar imagen (WebP/JPEG <=200KB) - más eficiente
-const icmp=async(file,maxW=1600,maxKB=200)=>{
-  const du=await new Promise(r=>{const fr=new FileReader();fr.onload=e=>r(e.target.result);fr.readAsDataURL(file)});
-  const img=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=du;});
-  const ratio=Math.min(1,maxW/img.naturalWidth), [w,h]=[Math.round(img.naturalWidth*ratio),Math.round(img.naturalHeight*ratio)];
-  const cv=Object.assign(document.createElement('canvas'),{width:w,height:h}); cv.getContext('2d').drawImage(img,0,0,w,h);
-  const fmt=cv.toDataURL('image/webp').startsWith('data:image/webp')?'image/webp':'image/jpeg';
-  let [q,url]=[0.9,''];
-  for(let i=0;i<6&&q>=0.5;i++,q=(q+0.5)/2){
-    url=cv.toDataURL(fmt,q);
-    if(Math.ceil((url.length-(`data:${fmt};base64,`).length)*3/4)<=maxKB*1024) break;
-  } return url;
-};
+      const statusText = plato.id.startsWith('temp_') ? ' (nuevo - sin guardar)' : '';
+      $titulo.text(`Hoja ${plato.hoja} - ${plato.titulo || 'Sin título'}${statusText}`);
+      
+      const campos = {
+        '#editorTitulo': plato.titulo || '',
+        '#editorDescripcion': plato.descripcion || '',
+        '#editorPrecio': plato.precio || '',
+        '#editorOrden': plato.orden || 0,
+        '#editorEstado': plato.estado || 'activo'
+      };
+      
+      Object.entries(campos).forEach(([selector, valor]) => $(selector).val(valor));
+    },
 
-// UI helpers optimizados
-const lst=()=>$bx.map((i,e)=>$(e).attr('data-src')?i:null).get().filter(x=>x!==null);
-const upd=($e,k)=>{if(getls(ikr(k||$e.attr('data-k')))&&!$e.find('.fa-cloud-arrow-up').length) $e.append(' <i class="fa-solid fa-cloud-arrow-up"></i>');};
-const thumb=()=>{const L=lst(); $th.html(L.map(i=>`<div class="ti" data-i="${i}"><img src="${$bx.eq(i).attr('data-src')}">${getls(ikr($bx.eq(i).attr('data-k')))?'<i class="fa-solid fa-cloud-arrow-up"></i>':''}</div>`).join('')); $th.find(`[data-i="${ci}"]`).addClass('on');};
-const set=(i,src)=>{const $b=$bx.eq(i), k=$b.attr('data-k'); $b.attr('data-src',src).addClass('fill').html(`<img src="${src}">`); upd($b,k); savels(k,src,720); savels(ikd(k),1,12); thumb();};
-const emp=()=>$bx.toArray().findIndex(e=>!$(e).attr('data-src'));
-const rea=async f=>{const opt=await icmp(f); set(emp()>=0?emp():0,opt);};
-const take=fs=>[...fs].filter(f=>f?.type?.startsWith('image/')).forEach(rea);
+    preview: () => {
+      const $container = $('#previewContainer');
+      const hoja = utils.getHoja(state.hojaActiva);
+      const platos = utils.getPlatos(state.hojaActiva)
+                          .filter(p => p.estado === 'activo')
+                          .sort((a,b) => {
+                            const ao = Number(a.orden||0), bo = Number(b.orden||0);
+                            return ao !== bo ? ao - bo : String(a.titulo||'').localeCompare(String(b.titulo||''));
+                          });
 
-// Eventos: pegar + DRAG&DROP + subir (FIXED)
-$ps.on('paste',e=>{const d=e.originalEvent.clipboardData; d&&take([...d.items].map(x=>x.getAsFile()).filter(Boolean));});
-$ps.on('dblclick',()=>$('<input type="file" accept="image/*" multiple hidden>').appendTo('body').on('change',e=>{take(e.target.files); $(e.target).remove();}).trigger('click'));
+      const platosHtml = platos.map(plato => `
+        <div class="preview-item">
+          <div class="preview-header">
+            <h3>${plato.titulo || 'Sin título'}</h3>
+            <span class="preview-price">S/ ${utils.fmtPrecio(plato.precio)}</span>
+          </div>
+          <p class="preview-description">${plato.descripcion || ''}</p>
+          <div class="preview-divider"></div>
+        </div>
+      `).join('');
 
-// DRAG & DROP FIXED - Prevenir navegación
-$ps.on('dragover dragenter',e=>{e.preventDefault(); e.stopPropagation();});
-$ps.on('drop',e=>{e.preventDefault(); e.stopPropagation(); const dt=e.originalEvent.dataTransfer; dt?.files?.length&&take(dt.files);});
-$(document).on('dragover drop',e=>e.preventDefault()); // Global fallback
+      const imagenPreview = hoja?.imagen ? 
+        `<img src="${hoja.imagen}" alt="Menu imagen" class="preview-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlbiBubyBlbmNvbnRyYWRhPC90ZXh0Pjwvc3ZnPg=='" />` : 
+        `<div class="no-image"><i class="fas fa-image"></i><p>Sin imagen</p></div>`;
 
-// Cargar imágenes guardadas localmente
-const load=()=>{getsaves('.ibx .bx','data-k',($e,v)=>{if(v){$e.attr('data-src',v).addClass('fill').html(`<img src="${v}">`); upd($e);}}); gosaves('.ibx .bx','data-k',$e=>$e.attr('data-src')||''); thumb();};
-load();
+      $container.html(`
+        <div class="mobile-preview">
+          <div class="preview-header-section">
+            ${imagenPreview}
+          </div>
+          <div class="preview-content">
+            <h2 class="preview-title">
+              <i class="fas ${hoja?.icono || 'fa-utensils'}"></i>
+              ${hoja?.titulo || 'Sin título'}
+            </h2>
+            <p class="nota_preview">${hoja?.nota || ''}</p>
+            <div class="preview-items">
+              ${platos.length ? platosHtml : '<p class="no-items">No hay platos disponibles</p>'}
+            </div>
+          </div>
+        </div>
+      `);
+    },
 
-// OPCIÓN 1: Auto-sync (silencioso al ocultar pestaña)
-const isyn=async({silent=false}={})=>{
-  const {currentUser:u}=auth, email=u?.email, usuario=u?.displayName||wi?.nombre||''; if(!email) return;
-  const dirty=$bx.filter((i,e)=>{const k=$(e).attr('data-k'); return $(e).attr('data-src')&&getls(ikd(k));}).get();
-  if(!dirty.length) return silent||Mensaje('Nada que sincronizar');
+    all: () => {
+      render.hojas();
+      render.platos();
+      render.editor();
+      render.preview();
+    }
+  };
+
+  // 🌐 OPERACIONES FIREBASE
+  const firebase = {
+    load: async () => {
+      try {
+        showLoading(true);
+        const [snapHojas, snapCartas] = await Promise.all([
+          getDocs(query(collection(db, CONFIG.COL_HOJAS), limit(50))),
+          getDocs(query(collection(db, CONFIG.COL_CARTAS), limit(500)))
+        ]);
+        
+        state.hojas = snapHojas.docs.map(d => ({ id: d.id, ...d.data() }));
+        state.cartas = snapCartas.docs.map(d => ({ id: d.id, ...d.data() }));
+        
+        savels(CONFIG.CACHE_HOJAS, state.hojas, CONFIG.CACHE_HRS.hojas);
+        savels(CONFIG.CACHE_CARTAS, state.cartas, CONFIG.CACHE_HRS.cartas);
+        
+        render.all();
+        Notificacion('Datos cargados exitosamente', 'success', 1800);
+      } catch(e) { 
+        console.error(e); 
+        Notificacion('Error al cargar datos', 'error'); 
+      } finally { 
+        showLoading(false); 
+      }
+    },
+
+    saveHoja: async (hojaId) => {
+      const $item = $(`.hoja-item[data-id="${hojaId}"]`);
+      const hoja = state.hojas.find(h => h.id === hojaId);
+      if (!hoja) return;
+
+      const [titulo, imagen, nota] = ['.hoja-titulo', '.hoja-imagen', '.hoja-nota']
+        .map(sel => $item.find(sel).val().trim());
+
+      if (!titulo) return Notificacion('El título es requerido', 'warning');
+
+      const isTemp = hojaId.startsWith('temp_');
+      const realId = isTemp ? utils.nextIds.hoja() : hojaId;
+      
+      const dataToSave = {
+        numero: hoja.numero,
+        titulo, imagen, nota,
+        icono: hoja.icono || 'fa-utensils',
+        estado: hoja.estado || 'activo',
+        orden: hoja.orden || hoja.numero,
+        creacion: isTemp ? serverTimestamp() : hoja.creacion,
+        actualizacion: serverTimestamp(),
+        poremail: auth.currentUser?.email || 'sin-email',
+        porusuario: auth.currentUser?.displayName || 'sin-usuario'
+      };
+
+      await setDoc(doc(db, CONFIG.COL_HOJAS, realId), dataToSave);
+
+      // ✅ ACTUALIZACIÓN LOCAL CORREGIDA (incluye nota)
+      if (isTemp) {
+        const index = state.hojas.findIndex(h => h.id === hojaId);
+        state.hojas[index] = { id: realId, ...dataToSave };
+        state.dirtyItems.hojas.delete(hojaId);
+      } else {
+        Object.assign(hoja, { titulo, imagen, nota }); // ← FIX: Incluir nota
+        state.dirtyItems.hojas.delete(hojaId);
+      }
+      
+      savels(CONFIG.CACHE_HOJAS, state.hojas, CONFIG.CACHE_HRS.hojas);
+      render.all();
+      Mensaje('Hoja guardada exitosamente');
+    },
+
+    savePlato: async (platoId) => {
+      const plato = state.cartas.find(p => p.id === platoId);
+      if (!plato) return;
+
+      const campos = ['#editorTitulo', '#editorDescripcion', '#editorPrecio', '#editorOrden', '#editorEstado']
+        .reduce((acc, sel) => {
+          const $el = $(sel);
+          const key = sel.replace('#editor', '').toLowerCase();
+          acc[key] = key === 'precio' ? ($el.val() === '' ? null : Number($el.val())) :
+                    key === 'orden' ? Number($el.val()) || 0 : 
+                    $el.val().trim();
+          return acc;
+        }, {});
+
+      if (!campos.titulo) return Notificacion('El título es requerido', 'warning');
+      if (campos.precio !== null && (isNaN(campos.precio) || campos.precio < 0)) {
+        return Notificacion('Precio debe ser un número válido', 'warning');
+      }
+
+      const isTemp = platoId.startsWith('temp_');
+      const realId = isTemp ? utils.nextIds.carta() : platoId;
+      
+      const dataToSave = {
+        titulo: campos.titulo,
+        descripcion: campos.descripcion,
+        precio: campos.precio,
+        orden: campos.orden,
+        estado: campos.estado,
+        hoja: plato.hoja,
+        creacion: isTemp ? serverTimestamp() : plato.creacion,
+        actualizacion: serverTimestamp()
+      };
+
+      await setDoc(doc(db, CONFIG.COL_CARTAS, realId), dataToSave);
+
+      if (isTemp) {
+        const index = state.cartas.findIndex(p => p.id === platoId);
+        state.cartas[index] = { id: realId, ...dataToSave };
+        state.dirtyItems.cartas.delete(platoId);
+        state.platoActivo = realId;
+      } else {
+        Object.assign(plato, campos);
+        state.dirtyItems.cartas.delete(platoId);
+      }
+      
+      savels(CONFIG.CACHE_CARTAS, state.cartas, CONFIG.CACHE_HRS.cartas);
+      render.all();
+      Mensaje('Plato guardado exitosamente');
+    }
+  };
+
+  // 🎛️ EVENT LISTENERS MODERNOS
+  const events = {
+    init: () => {
+      // Navegación entre hojas
+      $(document).on('click', '.hoja-item', function(){
+        const nuevaHoja = Number($(this).data('hoja'));
+        if (nuevaHoja !== state.hojaActiva) {
+          state.hojaActiva = nuevaHoja;
+          state.platoActivo = null;
+
+          $('.hoja-item').removeClass('active');
+          $(this).addClass('active');
+
+          render.platos();
+          render.editor();
+          render.preview();
+        }
+      });
+
+      // Selección de platos
+      $(document).on('click', '.plato-item', function(){
+        const nuevoPlato = $(this).data('id');
+        if (nuevoPlato !== state.platoActivo) {
+          state.platoActivo = nuevoPlato;
+
+          $('.plato-item').removeClass('active');
+          $(this).addClass('active');
+          render.editor();
+        }
+      });
+
+      // Marcar como dirty (optimizado)
+      $(document).on('input', '.hoja-titulo, .hoja-imagen, .hoja-nota', function(){
+        const hojaId = $(this).closest('.hoja-item').data('id');
+        state.dirtyItems.hojas.add(hojaId);
+        $(this).closest('.hoja-item').addClass('dirty');
+      });
+
+      $(document).on('input change', '#editorTitulo, #editorDescripcion, #editorPrecio, #editorOrden, #editorEstado', function(){
+        if (state.platoActivo) {
+          state.dirtyItems.cartas.add(state.platoActivo);
+          $(`.plato-item[data-id="${state.platoActivo}"]`).addClass('dirty');
+        }
+      });
+
+      // CRUD Operations
+      $(document).on('click', '.bt_add_hoja', function(){
+        const siguienteNumero = Math.max(0, ...state.hojas.map(h => h.numero || 0)) + 1;
+        const nuevaHoja = {
+          id: utils.nextIds.temp(),
+          numero: siguienteNumero,
+          titulo: `Nueva Hoja ${siguienteNumero}`,
+          icono: 'fa-utensils',
+          imagen: '', nota: '',
+          estado: 'activo',
+          orden: siguienteNumero
+        };
+
+        state.hojas.push(nuevaHoja);
+        state.dirtyItems.hojas.add(nuevaHoja.id);
+        state.hojaActiva = siguienteNumero;
+        render.all();
+        Notificacion('Nueva hoja agregada - Recuerda guardar', 'info', 2000);
+      });
+
+      $(document).on('click', '.bt_add_plato', function(){
+        if (!utils.getHoja(state.hojaActiva)) {
+          return Notificacion('Crea una hoja primero', 'warning');
+        }
+
+        const ordenMax = Math.max(0, ...utils.getPlatos(state.hojaActiva).map(d => +d.orden||0)) + 1;
+        const nuevoPlato = {
+          id: utils.nextIds.temp(),
+          titulo: 'NUEVO PLATO',
+          descripcion: '', precio: null,
+          estado: 'activo',
+          hoja: state.hojaActiva,
+          orden: ordenMax
+        };
+
+        state.cartas.push(nuevoPlato);
+        state.dirtyItems.cartas.add(nuevoPlato.id);
+        state.platoActivo = nuevoPlato.id;
+        render.all();
+        Notificacion('Nuevo plato agregado - Recuerda guardar', 'info', 2000);
+      });
+
+      // Guardar con spinners
+      $(document).on('click', '.bt_guardar_hoja', async function(){
+        const $btn = $(this);
+        const hojaId = $btn.closest('.hoja-item').data('id');
+        
+        try {
+          utils.spinner.set($btn, true);
+          await firebase.saveHoja(hojaId);
+        } catch(e) {
+          console.error(e);
+          Notificacion('Error al guardar hoja', 'error');
+        } finally {
+          utils.spinner.set($btn, false);
+        }
+      });
+
+      $(document).on('click', '.bt_guardar_plato', async function(){
+        if (!state.platoActivo) return Notificacion('Selecciona un plato', 'warning');
+        
+        const $btn = $(this);
+        try {
+          utils.spinner.set($btn, true);
+          await firebase.savePlato(state.platoActivo);
+        } catch(e) {
+          console.error(e);
+          Notificacion('Error al guardar plato', 'error');
+        } finally {
+          utils.spinner.set($btn, false);
+        }
+      });
+
+      // Eliminar (optimizado)
+      $(document).on('click', '.bt_eliminar_plato', async function(){
+        if (!state.platoActivo) return Notificacion('Selecciona un plato', 'warning');
+        
+        const plato = state.cartas.find(p => p.id === state.platoActivo);
+        if (!confirm(`¿Eliminar "${plato?.titulo || state.platoActivo}"?`)) return;
+
+        const $btn = $(this);
+        try {
+          utils.spinner.set($btn, true, 'Eliminando...');
+          
+          if (!state.platoActivo.startsWith('temp_')) {
+            await deleteDoc(doc(db, CONFIG.COL_CARTAS, state.platoActivo));
+          }
+          
+          state.cartas = state.cartas.filter(p => p.id !== state.platoActivo);
+          state.dirtyItems.cartas.delete(state.platoActivo);
+          savels(CONFIG.CACHE_CARTAS, state.cartas, CONFIG.CACHE_HRS.cartas);
+          state.platoActivo = null;
+          render.all();
+          Mensaje('Plato eliminado exitosamente');
+        } catch(e) {
+          console.error(e);
+          Notificacion('Error al eliminar plato', 'error');
+        } finally {
+          utils.spinner.set($btn, false);
+        }
+      });
+
+      $(document).on('click', '.bt_eliminar_hoja', async function(){
+        const $btn = $(this);
+        const hojaId = $btn.closest('.hoja-item').data('id');
+        const hoja = state.hojas.find(h => h.id === hojaId);
+        if (!hoja) return;
+
+        const platosEnHoja = utils.getPlatos(hoja.numero);
+        let mensaje = `¿Eliminar hoja "${hoja.titulo}"?`;
+        if (platosEnHoja.length > 0) {
+          mensaje += `\n\nAdvertencia: También se eliminarán ${platosEnHoja.length} platos de esta hoja.`;
+        }
+        
+        if (!confirm(mensaje)) return;
+
+        try {
+          utils.spinner.set($btn, true, 'Eliminando...');
+          
+          if (!hojaId.startsWith('temp_')) {
+            const batch = writeBatch(db);
+            batch.delete(doc(db, CONFIG.COL_HOJAS, hojaId));
+            
+            platosEnHoja.forEach(plato => {
+              if (!plato.id.startsWith('temp_')) {
+                batch.delete(doc(db, CONFIG.COL_CARTAS, plato.id));
+              }
+            });
+            
+            await batch.commit();
+          }
+          
+          state.hojas = state.hojas.filter(h => h.id !== hojaId);
+          state.cartas = state.cartas.filter(c => c.hoja !== hoja.numero);
+          
+          savels(CONFIG.CACHE_HOJAS, state.hojas, CONFIG.CACHE_HRS.hojas);
+          savels(CONFIG.CACHE_CARTAS, state.cartas, CONFIG.CACHE_HRS.cartas);
+          
+          state.dirtyItems.hojas.delete(hojaId);
+          state.platoActivo = null;
+          
+          if (state.hojaActiva === hoja.numero) {
+            state.hojaActiva = state.hojas.length > 0 ? state.hojas[0].numero : 1;
+          }
+          
+          render.all();
+          Mensaje(`Hoja eliminada${platosEnHoja.length > 0 ? ` junto con ${platosEnHoja.length} platos` : ''}`);
+        } catch(e) {
+          console.error(e);
+          Notificacion('Error al eliminar hoja', 'error');
+        } finally {
+          utils.spinner.set($btn, false);
+        }
+      });
+
+      $(document).on('click', '.bt_recargar', firebase.load);
+
+      // Auto-save local con gosaves/getsaves
+      gosaves('.hoja-titulo, .hoja-imagen, .hoja-nota', 'data-temp-id', $el => $el.val());
+      gosaves('#editorTitulo, #editorDescripcion, #editorPrecio, #editorOrden, #editorEstado', 'id', $el => $el.val());
+      
+      getsaves('.hoja-titulo, .hoja-imagen, .hoja-nota', 'data-temp-id', ($el, val) => $el.val(val));
+      getsaves('#editorTitulo, #editorDescripcion, #editorPrecio, #editorOrden, #editorEstado', 'id', ($el, val) => $el.val(val));
+    }
+  };
+  // 🚀 INICIALIZACIÓN
+  events.init();
+  render.all();
+  infoo(); // Para footer
   
-  const bat=writeBatch(db);
-  dirty.forEach(el=>{
-    const $e=$(el), [k,src]=[$e.attr('data-k'),$e.attr('data-src')], rf=doc(db,'smileimgs',`${email}_${k}`);
-    const dt={email,usuario,titulo:`Imagen ${k.replace('im','')}`,imagen:src,actualizacion:serverTimestamp()};
-    if(!getls(ikr(k))) dt.creacion=serverTimestamp();
-    bat.set(rf,dt,{merge:true});
-  });
-  
-  try{
-    await bat.commit();
-    dirty.forEach(el=>{const $e=$(el), k=$e.attr('data-k'); savels(ikr(k),1,720); removels(ikd(k)); upd($e,k);});
-    if(!silent) Mensaje('Imágenes guardadas en la nube');
-    okgd?.(); thumb();
-  }catch(e){console.error('Sync imgs error:',e); !silent&&Notificacion('Error al sincronizar imágenes','error');}
-};
-
-// OPCIÓN 2: Sync manual con botón .dw (para móviles)
-const syncManual=async()=>{
-  const {currentUser:u}=auth, email=u?.email, usuario=u?.displayName||wi?.nombre||''; if(!email) return Notificacion('Debes iniciar sesión','error');
-  const dirty=$bx.filter((i,e)=>{const k=$(e).attr('data-k'); return $(e).attr('data-src')&&getls(ikd(k));}).get();
-  if(!dirty.length) return Mensaje('No hay imágenes nuevas para guardar');
-  
-  // Mostrar progreso
-  const $btn=$('.vw .dw'); $btn.html('<i class="fa-solid fa-spinner fa-spin"></i>').prop('disabled',true);
-  
-  const bat=writeBatch(db);
-  dirty.forEach(el=>{
-    const $e=$(el), [k,src]=[$e.attr('data-k'),$e.attr('data-src')], rf=doc(db,'smileimgs',`${email}_${k}`);
-    const dt={email,usuario,titulo:`Imagen ${k.replace('im','')}`,imagen:src,actualizacion:serverTimestamp()};
-    if(!getls(ikr(k))) dt.creacion=serverTimestamp();
-    bat.set(rf,dt,{merge:true});
-  });
-  
-  try{
-    await bat.commit();
-    dirty.forEach(el=>{const $e=$(el), k=$e.attr('data-k'); savels(ikr(k),1,720); removels(ikd(k)); upd($e,k);});
-    Mensaje('Guardado en nube'); // Mensaje específico para sync manual
-    thumb();
-  }catch(e){
-    console.error('Manual sync error:',e); 
-    Notificacion('Error al guardar en la nube','error');
-  }finally{
-    // Restaurar botón
-    $btn.html('<i class="fa-solid fa-cloud-arrow-up"></i>').prop('disabled',false);
+  if (state.hojas.length === 0 || state.cartas.length === 0) {
+    firebase.load();
   }
-};
-
-// Hidratar desde Firebase (si local vacío)
-const ihid=async()=>{
-  const {currentUser:u}=auth, email=u?.email; if(!email||lst().length) return;
-  try{
-    const sn=await getDocs(query(collection(db,'smileimgs'),where('email','==',email),limit(60)));
-    sn.forEach(ds=>{
-      const {imagen:src,...d}=ds.data()||{}, k=ds.id.split('_')[1]||'im1', $b=$bx.filter(`[data-k="${k}"]`);
-      if($b.length&&src){$b.attr('data-src',src).addClass('fill').html(`<img src="${src}">`); savels(k,src,720); savels(ikr(k),1,720); upd($b,k);}
-    }); thumb();
-  }catch(e){console.error('Hydrate imgs error:',e);}
-};
-
-// Live updates desde Firebase
-let iun=null; const isub=()=>{
-  const {currentUser:u}=auth, email=u?.email; if(!email) return; iun?.(); 
-  iun=onSnapshot(query(collection(db,'smileimgs'),where('email','==',email),limit(60)),sn=>{
-    sn.docChanges().forEach(({type,doc})=>{
-      if(type==='removed') return;
-      const {imagen:src,...d}=doc.data()||{}, k=doc.id.split('_')[1]||'im1', $b=$bx.filter(`[data-k="${k}"]`);
-      if(src&&$b.length&&!getls(ikd(k))){$b.attr('data-src',src).addClass('fill').html(`<img src="${src}">`); savels(k,src,720); savels(ikr(k),1,720); upd($b,k);}
-    }); thumb();
-  },e=>console.error('Snapshot imgs error:',e));
-};
-
-// Eliminar imagen (local + remoto)
-const idel=async k=>{
-  const {currentUser:u}=auth, email=u?.email;
-  try{email&&await deleteDoc(doc(db,'smileimgs',`${email}_${k}`));}catch(e){console.error('Delete img error:',e);}
-  [k,ikd(k),ikr(k)].forEach(removels); $bx.filter(`[data-k="${k}"]`).removeAttr('data-src').removeClass('fill').empty(); thumb(); Mensaje('Imagen eliminada');
-};
-
-// Visor fullscreen + navegación
-const show=i=>{const s=$bx.eq(i).attr('data-src'); if(!s) return; ci=i; $im.attr('src',s); $vw.addClass('show'); thumb(); const $ti=$th.find(`[data-i="${i}"]`).addClass('on'); $ti.length&&$th.animate({scrollLeft:Math.max(0,$ti.position().left+$th.scrollLeft()-($th.width()-$ti.width())/2)},180);};
-const hide=()=>{$vw.removeClass('show'); ci=-1;};
-const nav=dir=>{const L=lst(); if(!L.length) return hide(); show(L[(L.indexOf(ci)+dir+L.length)%L.length]);};
-const dl=()=>{const a=Object.assign(document.createElement('a'),{href:$im.attr('src'),download:`wiimage-${ci+1}.png`}); document.body.append(a); a.click(); a.remove();};
-const rm=async()=>{const k=$bx.eq(ci).attr('data-k'); await idel(k); const L=lst(); L.length?show(L[0]):hide();};
-
-// Eventos UI del visor
-$(document).on('click','.ibx .bx',e=>{const i=$bx.index(e.currentTarget); $(e.currentTarget).attr('data-src')&&show(i);});
-$(document).on('click','.vw .cls',hide);
-$(document).on('click','.vw',e=>{if(e.target===e.currentTarget) hide();});
-$(document).on('click','.vw .nx',()=>nav(1));
-$(document).on('click','.vw .pv',()=>nav(-1));
-$(document).on('click','.vw .dl',dl);
-$(document).on('click','.vw .rm',rm);
-$(document).on('click','.vw .dw',syncManual); // NUEVO: Sync manual con botón
-$(document).on('click','.vw .th .ti',e=>show(+$(e.currentTarget).data('i')));
-
-// Atajos de teclado en visor
-$(document).on('keydown',e=>{
-  if(!$vw.hasClass('show')) return;
-  if(e.ctrlKey&&['s','S'].includes(e.key)) return e.preventDefault(),dl();
-  if(e.key==='Escape') return hide();
-  if(['ArrowRight','>','.'].includes(e.key)) return nav(1);
-  if(['ArrowLeft','<',','].includes(e.key)) return nav(-1);
-  if(['Delete','Supr','Backspace'].includes(e.key)) return rm();
-  if(e.key===' ') return e.preventDefault(),syncManual(); // Espaciadora para sync manual
-});
-
-// Botón "Borrar todo" (notas + imágenes)
-$(document).on('click','.bt_borrar',async function(){
-  if(!confirm('¿Eliminar todo lo guardado?')) return;
-  try{localStorage.clear();}catch(_){Object.keys(localStorage).forEach(k=>localStorage.removeItem(k));}
-  $('[data-ki^="ki"]').remove(); $('.txe').removeAttr('id').empty(); cnt=0;
-  $bx.removeAttr('data-src').removeClass('fill').empty(); hide(); thumb();
-  adtm(this,'bta','Eliminado','Eliminar');
-});
-
-// OPCIÓN 1: Auto-sync al ocultar pestaña (para desktop)
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') isyn({silent:true}); });
-
-// Inicialización
-(async()=>{await ihid(); isub();})();
-
-// JQUERY CONTENIDO JS [End] 
-
-}// DIOS SIEMPRE ES BUENO Y YO AMO A DIOS [START]
-
- 
+}

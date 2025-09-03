@@ -90,15 +90,20 @@ const showRegistro = `
           </div>
         </div>
         <div class="form-group">
-          <div class="input-icon"> <i class="fas fa-phone"></i>
-            <input type="text" id="regCelular" placeholder="Celular" required>
-          </div>
-        </div>
-        <div class="form-group">
           <div class="input-icon"> <i class="fas fa-cake-candles"></i>
             <input type="date" id="regFechaNacimiento" placeholder="Fecha de nacimiento" class="datepicker" required>
           </div>
         </div>
+
+        <div class="form-group">
+          <div class="input-icon"> <i class="fas fa-venus-mars"></i>
+            <select id="regGenero" required>
+              <option value="femenino" selected>Femenino</option>
+              <option value="masculino">Masculino</option>
+            </select>
+          </div>
+        </div>
+        
         <div class="form-group">
           <div class="input-icon"> <i class="fas fa-lock"></i>
             <input type="password" id="regPassword" placeholder="Contraseña" required>
@@ -198,16 +203,16 @@ $(function(){
 
   const validacionesRegistro = {
       regEmail: [v => v.toLowerCase(), v => /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(v) || 'Correo inválido'],
-      regUsuario: [v => v.toLowerCase().replace(/[^a-z0-9_]/g, ''), v => v.length >= 4 || 'Usuario 4-20 caracteres'],
+      regUsuario: [v => v.toLowerCase().replace(/[^a-z0-9_]/g, ''), v => v.length >= 3 || 'Usuario 3-20 caracteres'],
       regNombre: [v => v.trim(), v => v.length > 0 || 'Ingrese nombre'],
       regApellidos: [v => v.trim(), v => v.length > 0 || 'Ingrese apellidos'],
-      regCelular: [v => v.replace(/\D/g, ''), v => v.length >= 8 || 'Mínimo 8 dígitos'],
+      regGenero: [v => v, v => ['femenino','masculino'].includes(v) || 'Selecciona género'],
       regFechaNacimiento: [v => v, v => calcularEdad(v) >= 13 || 'Tienes que ser mayor de 13 años'],
       regPassword: [v => v, v => v.length >= 6 || 'Mínimo 6 caracteres'],
       regPassword1: [v => v, v => v === $('#regPassword').val() || 'Contraseñas no coinciden']
   };
   $.each(validacionesRegistro, function(id, [tis, validado]) {
-    $(`#${id}`).on('blur', function() {
+    $(`#${id}`).on('blur change', function() {
       const vl = tis($(this).val());  $(this).val(vl);
       const result = validado(vl);
       if (result !== true) witip(this, result, 'error');
@@ -252,8 +257,8 @@ $('#Registrar').click(async function(){
 
   try {
     //Trayendo valores listos y verificados
-    const campos = ['regEmail', 'regUsuario', 'regNombre', 'regApellidos', 'regCelular', 'regPassword'];
-    const [email, usuario, nombre, apellidos, celular, password] = campos.map(id=> $('#' + id).val().trim());
+    const campos = ['regEmail', 'regUsuario', 'regNombre', 'regApellidos', 'regGenero', 'regPassword'];
+    const [email, usuario, nombre, apellidos, genero, password] = campos.map(id=> $('#' + id).val().trim());
     
     // REGISTRANDO EN AUTH 
     const {user} = await createUserWithEmailAndPassword(auth, email, password);
@@ -267,7 +272,7 @@ $('#Registrar').click(async function(){
       email,         
       nombre,     
       apellidos,  
-      celular,
+      genero,
       rol,    
       fechaNacimiento: fechaLocal($('#regFechaNacimiento').val()),
       creacion: serverTimestamp(),
@@ -296,6 +301,7 @@ $('#Login').click(async function() {
 
     await signInWithEmailAndPassword(auth, email, password); // Iniciando
     savels(wiAuthIn,'wIn',24); savels(wiAuthRol, busq.data().rol, 24); accederRol(busq.data().rol);  //Actualizando seguridad
+
   }catch(e){
     const errores = {
       'auth/invalid-credential': 'Contraseña incorrecta',
@@ -337,7 +343,7 @@ $('body').append(showLogin + showRegistro + showRestablecer); //Actualizando en 
 
 // MODALES Y ESTILOS PARA CSS 
 function wiAuthCSS(){
-  const css=".modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;justify-content:center;align-items:center;backdrop-filter:saturate(120%) blur(2px)}.modal.active{display:flex}@keyframes mfade{from{opacity:0}to{opacity:1}}.modal{animation:mfade .25s ease}body.modal-open{overflow:hidden}.modal-content{background:var(--F);border-radius:1vh;box-shadow:var(--bsh);width:92%;max-width:600px;max-height:90vh;overflow:auto;animation:mpop .22s ease}@keyframes mpop{from{transform:translateY(10px) scale(.98);opacity:.6}to{transform:translateY(0) scale(1);opacity:1}}.authModals .modal-content{max-width:430px;padding:0;border:0;position:relative}.authModals .modal-header{border:0;padding:12px;position:absolute;right:0;z-index:10}.authModals .close-modal{background:0 0;border:0;color:var(--mco);font-size:1.4rem;cursor:pointer;transition:transform .15s,opacity .15s;text-shadow:0 1px 2px rgba(0,0,0,.15)}.authModals .close-modal:hover{transform:scale(1.08);opacity:.95}.auth-form{padding:0 36px 32px;display:flex;flex-direction:column;align-items:center}.auth-logo{width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:34px 0 8px;box-shadow:0 6px 18px var(--bxs)}.auth-logo img{width:100%;height:auto}.auth-title{font:700 1.6rem var(--ff_P);color:var(--mco);margin:4px 0 18px;text-align:center}.auth-title span{color:#ffe800}.auth-text{color:var(--tx);font-size:.92rem;margin:12px 0 4px;align-self:flex-start}#loginForm,#registroForm,#recuperarForm{width:100%;display:flex;flex-direction:column;gap:12px}.form-group{width:100%;position:relative}.input-icon{position:relative;display:flex;align-items:center}.input-icon i{position:absolute;left:14px;color:var(--mco);opacity:.75;transition:.25s}.input-icon .togglePass{left:auto;right:12px;cursor:pointer;color:#a8a8a8}.input-icon input{width:100%;padding:13px 38px 13px 42px;border-radius:10px;border:1px solid var(--bdr);background:var(--wb);color:var(--tx);transition:border-color .2s,box-shadow .2s}.input-icon input:focus{border-color:var(--mco);box-shadow:0 0 0 3px var(--bxs);outline:0}.input-icon input::placeholder{color:var(--txe);opacity:.7}.form-check{display:flex;align-items:center;gap:8px;margin:6px 0}.form-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--mco)}.btn-auth{width:100%;padding:13px 14px;background:var(--mco);color:var(--txa);border:0;border-radius:10px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px var(--bxs);transition:transform .15s,box-shadow .15s,background .15s}.btn-auth:hover{background:var(--hva);transform:translateY(-1px)}.inactivo{opacity:.75}.auth-links{width:100%;display:flex;justify-content:space-between;margin-top:12px;flex-wrap:wrap}.auth-links span{color:var(--mco);cursor:pointer;padding:6px 0;font-size:.95rem}.auth-links span:hover{color:var(--hv);text-decoration:underline}#registroModal #registroForm{display:grid;grid-template-columns:1fr 1fr;gap:12px}#registroModal .modal-content{max-width:568px}@media (max-width:576px){.auth-form{padding:0 20px 24px}.auth-title{font-size:1.4rem}.auth-logo{width:70px;height:70px;margin-top:26px}#registroModal #registroForm{display:flex;flex-direction:column}}";
+  const css=".modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;justify-content:center;align-items:center;backdrop-filter:saturate(120%) blur(2px)}.modal.active{display:flex}@keyframes mfade{from{opacity:0}to{opacity:1}}.modal{animation:mfade .25s ease}body.modal-open{overflow:hidden}.modal-content{background:var(--F);border-radius:1vh;box-shadow:var(--bsh);width:92%;max-width:600px;max-height:90vh;overflow:auto;animation:mpop .22s ease}@keyframes mpop{from{transform:translateY(10px) scale(.98);opacity:.6}to{transform:translateY(0) scale(1);opacity:1}}.authModals .modal-content{max-width:430px;padding:0;border:0;position:relative}.authModals .modal-header{border:0;padding:12px;position:absolute;right:0;z-index:10}.authModals .close-modal{background:0 0;border:0;color:var(--mco);font-size:1.4rem;cursor:pointer;transition:transform .15s,opacity .15s;text-shadow:0 1px 2px rgba(0,0,0,.15)}.authModals .close-modal:hover{transform:scale(1.08);opacity:.95}.auth-form{padding:0 36px 32px;display:flex;flex-direction:column;align-items:center}.auth-logo{width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:34px 0 8px;box-shadow:0 6px 18px var(--bxs)}.auth-logo img{width:100%;height:auto}.auth-title{font:700 1.6rem var(--ff_P);color:var(--mco);margin:4px 0 18px;text-align:center}.auth-title span{color:#ffe800}.auth-text{color:var(--tx);font-size:.92rem;margin:12px 0 4px;align-self:flex-start}#loginForm,#registroForm,#recuperarForm{width:100%;display:flex;flex-direction:column;gap:12px}.form-group{width:100%;position:relative}.input-icon{position:relative;display:flex;align-items:center}.input-icon i{position:absolute;left:14px;color:var(--mco);opacity:.75;transition:.25s}.input-icon .togglePass{left:auto;right:12px;cursor:pointer;color:#a8a8a8}.input-icon input{width:100%;padding:13px 38px 13px 42px;border-radius:10px;border:1px solid var(--bdr);background:var(--wb);color:var(--tx);transition:border-color .2s,box-shadow .2s}.input-icon input:focus{border-color:var(--mco);box-shadow:0 0 0 3px var(--bxs);outline:0}.input-icon input::placeholder{color:var(--txe);opacity:.7}.form-check{display:flex;align-items:center;gap:8px;margin:6px 0}.input-icon input,.input-icon select{width:100%;padding:13px 38px 13px 42px;border-radius:10px;border:1px solid var(--bdr);background:var(--wb);color:var(--tx);transition:border-color .2s,box-shadow .2s}.input-icon input:focus,.input-icon select:focus{border-color:var(--mco);box-shadow:0 0 0 3px var(--bxs);outline:0}.form-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--mco)}.btn-auth{width:100%;padding:13px 14px;background:var(--mco);color:var(--txa);border:0;border-radius:10px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px var(--bxs);transition:transform .15s,box-shadow .15s,background .15s}.btn-auth:hover{background:var(--hva);transform:translateY(-1px)}.inactivo{opacity:.75}.auth-links{width:100%;display:flex;justify-content:space-between;margin-top:12px;flex-wrap:wrap}.auth-links span{color:var(--mco);cursor:pointer;padding:6px 0;font-size:.95rem}.auth-links span:hover{color:var(--hv);text-decoration:underline}#registroModal #registroForm{display:grid;grid-template-columns:1fr 1fr;gap:12px}#registroModal .modal-content{max-width:568px}@media (max-width:576px){.auth-form{padding:0 20px 24px}.auth-title{font-size:1.4rem}.auth-logo{width:70px;height:70px;margin-top:26px}#registroModal #registroForm{display:flex;flex-direction:column}}";
   const $tag=$('.wiAuthCss'); $tag.length?$tag.text(css):$('head').append(`<style class="wiAuthCss">${css}</style>`);
 }
 
