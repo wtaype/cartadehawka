@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f8cd04">
-  <title>Cafetería Hawka - Desayunos</title>
+  <title>Cafetería Hawka - Ica</title>
   <link rel="icon" href="/logo.png" />
   <link rel="stylesheet" href="./style.css" />
   <script type="module" src="./main.js" defer></script>
@@ -13,6 +13,32 @@
   </style>
 </head>
 <body>
+
+  <header class="hd">
+    <h1 class="wilang">
+      <span class="wilang_titu">Language: </span>
+    <div class="midw_v1">
+        <div class="wilang-trigger">
+            <div class="wilang-selected">
+                <img src="https://www.svgrepo.com/show/508668/flag-us.svg" alt="English" class="flag-icon">
+                <span>English</span>
+            </div>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="wilang-content">
+            <div class="wilang-item" data-lang="en" data-url="https://cartadehawka.web.app/?en">
+                <img src="https://www.svgrepo.com/show/508668/flag-us.svg" alt="English" class="flag-icon">
+                <span>English</span>
+            </div>
+            <div class="wilang-item" data-lang="es" data-url="https://cartadehawka.web.app/?es">
+                <img src="https://www.svgrepo.com/show/405610/flag-for-flag-spain.svg" alt="Spanish" class="flag-icon">
+                <span>Español</span>
+            </div>
+        </div>
+    </div>
+    </h1>
+
+  </header>
   <!-- Contenido dinámico del menú -->
   <div id="menu-app">
       <div class="loadingSmile"><img src="./smile.png" alt="Avatar" class="user-avatar"/></div>
@@ -23,3 +49,4 @@
   </footer>
 </body>
 </html>
+

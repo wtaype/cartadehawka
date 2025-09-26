@@ -211,6 +211,13 @@ body {
 .weby i{
   font-size: initial;
   color: var(--haw);
+  /* color: #f8cd04;*/
+}
+.weby .fa-info-circle{
+    color: #f8cd04;
+}
+.hd{
+  text-align: center;
 }
 
 .separador {
@@ -244,15 +251,376 @@ body {
 }
 
 
+
+
+
+/* ========================================
+   WILANG COMPONENT STYLES
+======================================== */
+
+/* Variables locales para el componente */
+.midw_v1 {
+    /* Glass Effect Variables */
+    --glass-primary: rgba(139, 90, 60, 0.15);
+    --glass-secondary: rgba(139, 90, 60, 0.10);
+    --glass-border: rgba(139, 90, 60, 0.25);
+    --glass-border-light: rgba(139, 90, 60, 0.35);
+    --glass-hover: rgba(139, 90, 60, 0.20);
+    --glass-active: rgba(139, 90, 60, 0.30);
+    
+    /* Blur & Effects */
+    --blur-primary: blur(20px);
+    --blur-secondary: blur(15px);
+    --backdrop-saturation: saturate(180%);
+    
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    
+    /* Transitions */
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Shadows */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.18);
+    --shadow-2xl: 0 16px 32px rgba(0, 0, 0, 0.22);
+    
+    /* Typography */
+    --font-size-xs: 11px;
+    --font-size-sm: 12px;
+    --font-size-base: 14px;
+    --font-size-md: 15px;
+    --font-size-lg: 16px;
+    
+    /* Colors - adaptadas a tu tema */
+    --color-white: #ffffff;
+    --color-text-primary: var(--primary-text);
+    --color-text-secondary: var(--secondary-text);
+    --color-text-tertiary: rgba(45, 45, 45, 0.6);
+    
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 20px;
+    --space-2xl: 24px;
+    
+    /* Main Container */
+    position: relative;
+    width: 100%;
+    max-width: 280px;
+    isolation: isolate;
+    display: inline-block;
+}
+
+/* ========================================
+   TRIGGER BUTTON STYLES
+======================================== */
+.wilang-trigger {
+    /* Glass Morphism Effect - adaptado a tu fondo blanco */
+    background: var(--bg-white);
+    backdrop-filter: var(--blur-secondary) var(--backdrop-saturation);
+    -webkit-backdrop-filter: var(--blur-secondary) var(--backdrop-saturation);
+    
+    /* Border & Shape */
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    
+    /* Layout */
+    padding: var(--space-md) var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    width: 100%;
+    
+    /* Interaction */
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    
+    /* Visual Effects */
+    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: var(--transition-normal);
+    
+    /* Typography */
+    font-weight: 500;
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+    font-family: var(--ff_P);
+    
+    /* Transform Origin for Smooth Scaling */
+    transform-origin: center center;
+}
+
+/* Trigger Hover Effects */
+.wilang-trigger:hover {
+    background: var(--glass-hover);
+    border-color: var(--glass-border-light);
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Trigger Active State */
+.wilang-trigger:active {
+    transform: translateY(0) scale(0.99);
+    transition: var(--transition-fast);
+}
+
+/* Selected Language Container */
+.wilang-selected {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex: 1;
+    min-width: 0;
+}
+
+.wilang-selected span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+/* ========================================
+   DROPDOWN CONTENT STYLES
+======================================== */
+.wilang-content {
+    /* Positioning */
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    
+    /* Glass Morphism Effect */
+    background: var(--bg-white);
+    backdrop-filter: var(--blur-secondary) var(--backdrop-saturation);
+    -webkit-backdrop-filter: var(--blur-secondary) var(--backdrop-saturation);
+    
+    /* Border & Shape */
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    
+    /* Initial Hidden State */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px) scale(0.95);
+    transform-origin: top center;
+    
+    /* Transition */
+    transition: var(--transition-normal);
+    
+    /* Visual Effects */
+    box-shadow: var(--shadow-xl), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+.wilang{
+  font-size: 1.6vh;
+}
+.wilang *{
+  font-size: 1.2vh;
+}
+.midw_v1{
+  display: flex;
+  margin: auto;
+  margin-block: .2vh 1vh;
+}
+
+/* Show State Animation */
+.wilang-content.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+/* ========================================
+   DROPDOWN ITEM STYLES
+======================================== */
+.wilang-item {
+    /* Layout */
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    
+    /* Interaction */
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    
+    /* Typography */
+    font-weight: 400;
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+    font-family: var(--ff_P);
+    
+    /* Transition */
+    transition: var(--transition-fast);
+    
+    /* Position for pseudo elements */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Item Hover Effects */
+.wilang-item:hover {
+    background: var(--glass-secondary);
+    color: var(--accent-color);
+    /* transform: translateX(2px); */
+}
+
+
+
+/* Hover Slide Effect */
+.wilang-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--glass-secondary), transparent);
+    transition: left 0.5s ease;
+    z-index: -1;
+}
+
+/* ========================================
+   FLAG ICON STYLES
+======================================== */
+.flag-icon {
+    /* Dimensions */
+    width: 28px;
+    height: 20px;
+    min-width: 28px;
+    min-height: 20px;
+    
+    /* Shape */
+    border-radius: 3px;
+    
+    /* Image Properties */
+    object-fit: cover;
+    object-position: center;
+    
+    /* Visual Effects */
+    box-shadow: var(--shadow-sm), 0 0 0 0.5px rgba(139, 90, 60, 0.1);
+    
+    /* Transition */
+    transition: var(--transition-fast);
+    
+    /* Performance */
+    will-change: transform;
+}
+
+
+/* ========================================
+   CHEVRON ICON STYLES
+======================================== */
+.midw_v1 .fa-chevron-down {
+    /* Size & Spacing */
+    font-size: var(--font-size-sm);
+    flex-shrink: 0;
+    
+    /* Visual */
+    color: var(--color-text-secondary);
+    
+    /* Transition */
+    transition: var(--transition-normal);
+    
+    /* Performance */
+    will-change: transform;
+}
+
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+@media (max-width: 480px) {
+    .midw_v1 {
+        min-width: auto;
+        max-width: 100%;
+        margin-left: 5%;
+    }
+    .wilang{
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .wilang_titu{
+      font-size: 1.5vh;
+    }
+    
+    .wilang-trigger,
+    .wilang-item {
+        padding: 10px var(--space-md);
+        font-size: var(--font-size-sm);
+        gap: 10px;
+    }
+    
+    .flag-icon {
+        width: 24px;
+        height: 18px;
+        min-width: 24px;
+        min-height: 18px;
+    }
+    
+    .wilang-content {
+        top: calc(100% + 6px);
+    }
+}
+
+@media (max-width: 320px) {
+    .wilang-trigger,
+    .wilang-item {
+        padding: var(--space-sm) 10px;
+        font-size: var(--font-size-xs);
+    }
+    
+    .flag-icon {
+        width: 20px;
+        height: 15px;
+        min-width: 20px;
+        min-height: 15px;
+    }
+}
+
 /* Para dispositivos grandes */
 @media (min-width: 961px) {
     body{
         background:#f0f1f5;
     }
+    .wilang{
+      display: flex;
+      justify-self: center;
+      align-items: center;
+    }
     .webz,.separador{max-width: 36vw;margin:auto}
     .webz{
-        background: yellow;
         grid-template-columns: 32% auto;
+    }
+    .midw_v1{
+      display: flex;
+      justify-content: center;
+    }
+    .wilang-trigger{
+      padding: 1.5vh 1vh;
+    }
+    .wilang-content.show{
+      margin: -6px auto;
+      width: 100%;
     }
 
     
@@ -312,3 +680,5 @@ body {
     padding-right: 0;
   }
 }
+
+

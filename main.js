@@ -1,165 +1,139 @@
 import $ from 'jquery';
-import { wiAuth } from './wiauth.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { db } from './firebase/init.js';
-import { getDocs, collection, query, limit } from "firebase/firestore";
-import { wiTema, Mensaje, Notificacion, savels, getls, removels, accederRol, gosaves, getsaves, showLoading, infoo } from './widev.js';
+import { getDocs, collection, query, limit, where } from 'firebase/firestore';
+import { savels, getls, removels } from './widev.js';
 
-// Alturas compactas
-const syncHeights = () => $('.webz').each((_, el) => {
-  const $el = $(el);
-  $el.find('.webx').css('height', $el.find('.weby').outerHeight());
+// Alturas sincronizadas (compacto)
+const syncHeights = () => $('.webz').each((_, el) => $(el).find('.webx').height($(el).find('.weby').outerHeight()));
+const debounced = (() => { let t; return () => (clearTimeout(t), t = setTimeout(syncHeights, 120)); })();
+$(debounced); $(window).on('load resize orientationchange', debounced);
+
+// Idiomas (toggle)
+$(() => {
+  const $w = $('.midw_v1'), $c = $w.find('.wilang-content');
+  $w.on('click', '.wilang-trigger', e => (e.stopPropagation(), $c.toggleClass('show'), $w.find('.fa-chevron-down').toggleClass('rotated')))
+    .on('click', '.wilang-item', function(){ $c.removeClass('show'); setTimeout(()=>location.href=$(this).data('url'),200); });
+  $(document).on('click', () => ($c.removeClass('show'), $w.find('.fa-chevron-down').removeClass('rotated')));
 });
-const debouncedSync = (() => {
-  let t; return () => (clearTimeout(t), t = setTimeout(syncHeights, 120));
-})(); 
-$(debouncedSync);
-$(window).on('load resize orientationchange', debouncedSync);
 
-// Config compacta
+// Config desde smile.js (opcional)
+const SM = window.smile || {};
 const CFG = {
-  COL_CARTAS: 'cartasdb',
-  COL_HOJAS: 'hojasdb',
-  C_CARTAS: 'cartasdbCachePublic',
-  C_HOJAS: 'hojasdbCachePublic',
-  HRS: 6,
-  LIM_CARTAS: 500,
-  LIM_HOJAS: 50,
-  IMG_FALLBACK: 'https://i.postimg.cc/KvN8qF2P/menu-default.jpg'
+  COL_CARTAS: SM.colCartas || 'cartasdb',
+  COL_HOJAS: SM.colHojas || 'hojasdb',
+  C_CARTAS: SM.cacheCartasKey || 'cartasdbCachePublic',
+  C_HOJAS: SM.cacheHojasKey || 'hojasdbCachePublic',
+  HRS: SM.cacheHoras || 6,
+  LIM_CARTAS: SM.limCartas || 500,
+  LIM_HOJAS: SM.limHojas || 50,
+  IMG_FALLBACK: SM.imgFallback || 'https://i.postimg.cc/KvN8qF2P/menu-default.jpg',
+  ICONO_HOJA: SM.iconoHoja || 'fa-utensils',
+  CURRENCY: SM.currency || 'S/',
+  SHOW_ESTADO: SM.showEstado !== false,
+  SHOW_ITEM_STATUS: !!SM.showItemStatus,
+  SHOW_ICONS: SM.showIcons !== false
 };
- 
-const money = v => (v == null || v === '') ? '' : `S/${Number(v).toFixed(2)}`;
+const isAct = s => String(s||'').toLowerCase()==='activo';
+const money = v => (v==null || v==='') ? '' : `${CFG.CURRENCY}${(+v).toFixed(2)}`;
 
-// Render de una hoja con imagen/título/nota/icono dinámicos
-const renderHoja = (num, items, headers) => {
-  const h = headers[num] || {};
-  const note = h.nota ? `<p class="menu-note"><i class="fas fa-info-circle"></i> ${h.nota}</p>` : '';
-  const img = h.imagen || CFG.IMG_FALLBACK;
-  const itemsHtml = items.map(it => `
-    <div class="menu-item">
+// Templating
+const itemHTML = it => {
+  const act = isAct(it.estado), ico = (CFG.SHOW_ICONS && it.icono) ? `<i class="fas ${it.icono}"></i> ` : '';
+  const st = CFG.SHOW_ITEM_STATUS && it.estado ? `<span class="badge ${act?'ok':'off'}">${it.estado}</span>` : '';
+  return `
+    <div class="menu-item${act?'':' is-off'}">
       <div class="item-header">
-        <h3>${it.titulo || ''}</h3>
+        <h3>${ico}${it.titulo||''} ${st}</h3>
         <span class="price">${money(it.precio)}</span>
       </div>
-      ${it.descripcion ? `<p class="description">${it.descripcion}</p>` : ''}
+      ${it.descripcion?`<p class="description">${it.descripcion}</p>`:''}
       <div class="dotted-line"></div>
-    </div>
-  `).join('');
+    </div>`;
+};
 
+const hojaHTML = (num, items, headers) => {
+  const h = headers[num] || {}, iconH = h.icono || CFG.ICONO_HOJA, img = h.imagen || CFG.IMG_FALLBACK;
+  const note = h.nota ? `<p class="menu-note"><i class="fas fa-info-circle"></i> ${h.nota}</p>` : '';
+  const estado = CFG.SHOW_ESTADO && h.estado ? `<span class="badge ${isAct(h.estado)?'ok':'off'}">${h.estado}</span>` : '';
   return `
     <div class="webz" data-hoja="${num}">
       <div class="webx">
-        <img src="${img}" alt="Menú ${h.titulo || `Hoja ${num}`}" loading="lazy"
+        <img src="${img}" alt="Menú ${h.titulo||`Hoja ${num}`}" loading="lazy"
              onerror="this.src='${CFG.IMG_FALLBACK}';this.onerror=null;">
-        <div class="image-overlay"><i class="fas ${h.icono || 'fa-utensils'}"></i></div>
+        <div class="image-overlay"><i class="fas ${iconH}"></i></div>
       </div>
       <div class="weby">
         <div class="menu-column">
           <header class="menu-header">
-            <h2 class="menu-category">
-              <i class="fas ${h.icono || 'fa-utensils'}"></i>
-              ${h.titulo || `Hoja ${num}`}
-            </h2>
+            <h2 class="menu-category"><i class="fas ${iconH}"></i> ${h.titulo||`Hoja ${num}`} ${estado}</h2>
             ${note}
           </header>
           <div class="menu-content">
-            ${itemsHtml || '<p class="no-items">No hay elementos disponibles</p>'}
+            ${items.length ? items.map(itemHTML).join('') : '<p class="no-items">No hay elementos disponibles</p>'}
           </div>
         </div>
       </div>
     </div>
-    <div class="separador">
-      <span class="sep-number">${num}</span>
-    </div>
-  `;
+    <div class="separador"><span class="sep-number">${num}</span></div>`;
 };
 
-// Pintar menú desde arrays
+// Pintar menú (solo hojas activas + cartas activas)
 const pintarMenu = (cartas, headers) => {
   const $root = $('#menu-app');
-  const grupos = cartas
-    .filter(c => (c.estado || '').toLowerCase() === 'activo')
-    .reduce((acc, c) => {
-      const n = Number(c.hoja || 0);
-      if (n > 0) (acc[n] = acc[n] || []).push(c);
-      return acc;
-    }, {});
-  
-  const hojasKeys = Array.from(
-    new Set([...Object.keys(grupos).map(Number), ...Object.keys(headers).map(Number)])
-  ).sort((a,b)=>a-b);
+  const activos = cartas.filter(c => isAct(c.estado));
+  const grupos = activos.reduce((m,c)=>((m[c.hoja=+c.hoja||0]||(m[c.hoja]=[])).push(c), m), {});
+  const keys = Object.keys(headers).map(Number).filter(n=>n>0 && isAct(headers[n].estado)).sort((a,b)=>a-b);
 
-  const html = hojasKeys.map(num => {
-    const items = (grupos[num] || []).sort((a,b) => {
-      const d = (Number(a.orden||0)) - (Number(b.orden||0));
-      return d !== 0 ? d : String(a.titulo||'').localeCompare(String(b.titulo||''));
-    });
-    return renderHoja(num, items, headers);
-  }).join('');
+  $root.html(keys.map(n => {
+    const items = (grupos[n]||[]).sort((a,b)=> (+(a.orden||0))-(+(b.orden||0)) || String(a.titulo||'').localeCompare(String(b.titulo||'')));
+    return hojaHTML(n, items, headers);
+  }).join(''));
 
-  $root.html(html);
-
-  // Esperar imágenes y fuentes para ajustar altura
   const imgs = $root.find('img').toArray();
-  const waitImgs = Promise.all(imgs.map(img => img.complete ? Promise.resolve() :
-    new Promise(res => { img.onload = img.onerror = res; })));
-  const waitFonts = (document.fonts?.ready) || Promise.resolve();
-  Promise.all([waitImgs, waitFonts]).then(() => setTimeout(syncHeights, 80));
+  Promise.all(imgs.map(i=>i.complete?Promise.resolve():new Promise(r=>{i.onload=i.onerror=r;})))
+    .then(()=> (document.fonts?.ready||Promise.resolve()))
+    .then(()=> setTimeout(syncHeights, 80));
 };
 
-// Carga pública con cache ultracorto
+// Carga con caché corta (solo activos)
 async function cargarCartasPublico() {
-  const needsRefresh = /\brefresh=1\b/i.test(location.search);
-  const cacheCartas = getls(CFG.C_CARTAS) || [];
-  const cacheHojasArr = getls(CFG.C_HOJAS) || [];
-  const cacheHeaders = cacheHojasArr.reduce((a,h)=>(a[h.numero]=h,a), {});
-
-  if (cacheCartas.length && Object.keys(cacheHeaders).length && !needsRefresh) {
-    pintarMenu(cacheCartas, cacheHeaders);
-  }
+  const refresh = /\brefresh=1\b/i.test(location.search) || SM.noCache;
+  const cacheCartas = (getls(CFG.C_CARTAS)||[]).filter(c=>isAct(c.estado));
+  const hojasArr = (getls(CFG.C_HOJAS)||[]).filter(h=>isAct(h.estado));
+  const headers = Object.fromEntries(hojasArr.map(h=>[h.numero,h]));
+  if (cacheCartas.length && Object.keys(headers).length && !refresh) pintarMenu(cacheCartas, headers);
 
   try {
     const [snapCartas, snapHojas] = await Promise.all([
-      getDocs(query(collection(db, CFG.COL_CARTAS), limit(CFG.LIM_CARTAS))),
-      getDocs(query(collection(db, CFG.COL_HOJAS), limit(CFG.LIM_HOJAS)))
+      getDocs(query(collection(db, CFG.COL_CARTAS), where('estado','==','activo'), limit(CFG.LIM_CARTAS))),
+      getDocs(query(collection(db, CFG.COL_HOJAS), where('estado','==','activo'), limit(CFG.LIM_HOJAS)))
     ]);
-    const cartas = snapCartas.docs.map(d => ({ id:d.id, ...d.data() }));
-    const hojasArr = snapHojas.docs.map(d => ({ id:d.id, ...d.data() }));
-    const headers = hojasArr.reduce((a,h)=>(a[h.numero]=h,a), {});
+    const cartas = snapCartas.docs.map(d=>({id:d.id, ...d.data()}));
+    const hojas = snapHojas.docs.map(d=>({id:d.id, ...d.data()}));
+    const hdrs = Object.fromEntries(hojas.map(h=>[h.numero,h]));
     savels(CFG.C_CARTAS, cartas, CFG.HRS);
-    savels(CFG.C_HOJAS, hojasArr, CFG.HRS);
-    pintarMenu(cartas, headers);
-  } catch (e) {
+    savels(CFG.C_HOJAS, hojas, CFG.HRS);
+    pintarMenu(cartas, hdrs);
+  } catch(e){
     console.error('Error cargando menú:', e);
-    if (!cacheCartas.length) {
-      $('#menu-app').html(`
-        <div class="error-state">
-          <i class="fas fa-exclamation-triangle"></i>
-          <h2>No se pudo cargar el menú</h2>
-          <p>Verifica tu conexión e intenta nuevamente.</p>
-          <button class="retry-btn" onclick="location.reload()">
-            <i class="fas fa-redo"></i> Reintentar
-          </button>
-        </div>
-      `);
-    }
+    if (!cacheCartas.length) $('#menu-app').html(`
+      <div class="error-state">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h2>No se pudo cargar el menú</h2>
+        <p>Verifica tu conexión e intenta nuevamente.</p>
+        <button class="retry-btn" onclick="location.reload()"><i class="fas fa-redo"></i> Reintentar</button>
+      </div>`);
   }
 }
 
+// Init + atajos
 $(document).ready(() => {
   cargarCartasPublico();
-
-  // Atajo para limpiar cache y recargar: Ctrl+Shift+R
   $(document).on('keydown', e => {
-    if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === 'R') {
-      removels(CFG.C_CARTAS, CFG.C_HOJAS);
-      location.reload();
-    }
+    if (e.ctrlKey && e.shiftKey && e.key.toUpperCase()==='R') { removels(CFG.C_CARTAS, CFG.C_HOJAS); location.reload(); }
   });
 });
 
-// Exponer utilidades mínimas
-window.hawkaMenu = {
-  reload: cargarCartasPublico,
-  clearCache: () => removels(CFG.C_CARTAS, CFG.C_HOJAS)
-};
+// API mínima
+window.hawkaMenu = { reload: cargarCartasPublico, clearCache: () => removels(CFG.C_CARTAS, CFG.C_HOJAS) };

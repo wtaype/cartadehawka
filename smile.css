@@ -838,6 +838,7 @@ opacity:1
   border-radius: 8px;
   margin-bottom: 0.5rem;
   padding: 0.75rem;
+  padding: 1.2vh .7vh 1vh .7vh;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
@@ -848,7 +849,20 @@ opacity:1
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-
+#hojasList button{
+  padding: .7vh 1vw;
+}
+.app button{
+  box-shadow: 0.2vh 0.2vh 1vh var(--bdr);
+}
+.bt_guardar_plato{
+  padding: .9vh 1.5vw;
+  box-shadow: 0.1vh 0.2vh .4vh var(--success)!important;
+}
+.bt_eliminar_plato{
+  padding: .9vh 1.5vw;
+  box-shadow: 0.1vh 0.2vh .4vh var(--error)!important;  
+}
 .hoja-item.active {
   background: var(--hbg);
   border-color: var(--mco);
@@ -891,7 +905,7 @@ opacity:1
 .hoja-content {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: .7vh;
   margin-bottom: 0.5rem;
 }
 
@@ -920,7 +934,7 @@ opacity:1
   color: var(--txh);
 }
 
-.hoja-titulo, .hoja-imagen {
+.hoja-titulo, .hoja-imagen, .hoja-nota {
   width: 100%;
   padding: 0.4rem 0.6rem;
   border: 1px solid var(--D);
@@ -934,6 +948,9 @@ opacity:1
   border-color: var(--mco);
   outline: none;
   box-shadow: 0 0 0 2px rgba(25, 120, 215, 0.1);
+}
+.nplatos{
+  font-size: 1.3vh;
 }
 
 .imagen-group {
@@ -1325,7 +1342,10 @@ opacity:1
 .preview-item:last-child .preview-divider {
   border: none;
 }
+#hojaicono,#hojaestado{
+  padding: 1vh .3vh;
 
+}
 .no-items {
   text-align: center;
   color: var(--secondary-text);
@@ -1385,3 +1405,4 @@ opacity:1
 }
 
 /* ...existing code... */
+
