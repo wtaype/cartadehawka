@@ -30,8 +30,6 @@ const CFG = {
   IMG_FALLBACK: SM.imgFallback || 'https://i.postimg.cc/KvN8qF2P/menu-default.jpg',
   ICONO_HOJA: SM.iconoHoja || 'fa-utensils',
   CURRENCY: SM.currency || 'S/',
-  SHOW_ESTADO: SM.showEstado !== false,
-  SHOW_ITEM_STATUS: !!SM.showItemStatus,
   SHOW_ICONS: SM.showIcons !== false
 };
 const isAct = s => String(s||'').toLowerCase()==='activo';
@@ -39,12 +37,11 @@ const money = v => (v==null || v==='') ? '' : `${CFG.CURRENCY}${(+v).toFixed(2)}
 
 // Templating
 const itemHTML = it => {
-  const act = isAct(it.estado), ico = (CFG.SHOW_ICONS && it.icono) ? `<i class="fas ${it.icono}"></i> ` : '';
-  const st = CFG.SHOW_ITEM_STATUS && it.estado ? `<span class="badge ${act?'ok':'off'}">${it.estado}</span>` : '';
+  const ico = (CFG.SHOW_ICONS && it.icono) ? `<i class="fas ${it.icono}"></i> ` : '';
   return `
-    <div class="menu-item${act?'':' is-off'}">
+    <div class="menu-item">
       <div class="item-header">
-        <h3>${ico}${it.titulo||''} ${st}</h3>
+        <h3>${ico}${it.titulo||''}</h3>
         <span class="price">${money(it.precio)}</span>
       </div>
       ${it.descripcion?`<p class="description">${it.descripcion}</p>`:''}
@@ -55,7 +52,6 @@ const itemHTML = it => {
 const hojaHTML = (num, items, headers) => {
   const h = headers[num] || {}, iconH = h.icono || CFG.ICONO_HOJA, img = h.imagen || CFG.IMG_FALLBACK;
   const note = h.nota ? `<p class="menu-note"><i class="fas fa-info-circle"></i> ${h.nota}</p>` : '';
-  const estado = CFG.SHOW_ESTADO && h.estado ? `<span class="badge ${isAct(h.estado)?'ok':'off'}">${h.estado}</span>` : '';
   return `
     <div class="webz" data-hoja="${num}">
       <div class="webx">
@@ -66,7 +62,7 @@ const hojaHTML = (num, items, headers) => {
       <div class="weby">
         <div class="menu-column">
           <header class="menu-header">
-            <h2 class="menu-category"><i class="fas ${iconH}"></i> ${h.titulo||`Hoja ${num}`} ${estado}</h2>
+            <h2 class="menu-category"><i class="fas ${iconH}"></i> ${h.titulo||`Hoja ${num}`}</h2>
             ${note}
           </header>
           <div class="menu-content">
@@ -83,7 +79,9 @@ const pintarMenu = (cartas, headers) => {
   const $root = $('#menu-app');
   const activos = cartas.filter(c => isAct(c.estado));
   const grupos = activos.reduce((m,c)=>((m[c.hoja=+c.hoja||0]||(m[c.hoja]=[])).push(c), m), {});
-  const keys = Object.keys(headers).map(Number).filter(n=>n>0 && isAct(headers[n].estado)).sort((a,b)=>a-b);
+  const keys = Object.keys(headers).map(Number).filter(n=>n>0).sort((a,b)=>a-b);
+
+  if (!keys.length) return $root.html('<p class="no-items txc">No hay menús disponibles</p>');
 
   $root.html(keys.map(n => {
     const items = (grupos[n]||[]).sort((a,b)=> (+(a.orden||0))-(+(b.orden||0)) || String(a.titulo||'').localeCompare(String(b.titulo||'')));
@@ -128,7 +126,7 @@ async function cargarCartasPublico() {
 }
 
 // Init + atajos
-$(document).ready(() => {
+$(() => {
   cargarCartasPublico();
   $(document).on('keydown', e => {
     if (e.ctrlKey && e.shiftKey && e.key.toUpperCase()==='R') { removels(CFG.C_CARTAS, CFG.C_HOJAS); location.reload(); }
@@ -137,3 +135,40 @@ $(document).ready(() => {
 
 // API mínima
 window.hawkaMenu = { reload: cargarCartasPublico, clearCache: () => removels(CFG.C_CARTAS, CFG.C_HOJAS) };
+
+
+// ...existing code...
+$(() => {
+  // Modal helpers (ligeros)
+  const openM = sel => $(sel).addClass('show').attr('aria-hidden','false');
+  const closeM = $m => $m.removeClass('show').attr('aria-hidden','true');
+
+  $(document).on('click','[data-modal]',function(e){ e.preventDefault(); openM($(this).data('modal')); });
+  $(document).on('click','.modal-close,.modal .modal-ok,.modal .modal-cancel',function(){ closeM($(this).closest('.modal')); });
+  $(document).on('click','.modal',function(e){ if(e.target === this) closeM($(this)); });
+
+  // Envío “Libro de reclamaciones” via mailto (sin backend)
+  const EMAIL_RECL = (window.smile?.emailReclamos)||'hawka.reclamos@example.com';
+  $(document).on('submit','#reclamosForm',function(e){
+    e.preventDefault();
+    const fd = new FormData(this), d = Object.fromEntries(fd.entries());
+    if(!d.nombres || !d.email || !d.detalle || !fd.get('consent')) return alert('Completa los campos obligatorios.');
+    const body = [
+      `Nombre: ${d.nombres}`,
+      `Email: ${d.email}`,
+      `Teléfono: ${d.telefono||'-'}`,
+      `Pedido: ${d.pedido||'-'}`,
+      `Detalle:`,
+      d.detalle
+    ].join('\n');
+    const url = `mailto:${encodeURIComponent(EMAIL_RECL)}?subject=${encodeURIComponent('Reclamo - Cartas Hawka')}&body=${encodeURIComponent(body)}`;
+    window.location.href = url;
+    alert('Gracias. Tu reclamo será atendido.');
+    this.reset();
+    closeM($('#modal-recl'));
+  });
+
+  // Año dinámico en footer
+  $('.wty').text(new Date().getFullYear());
+});
+// ...existing code...
