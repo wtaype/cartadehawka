@@ -9,15 +9,15 @@
   <style id='loadingSmile' type='text/css'>
   .loadingSmile{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#ffffff;display:flex;align-items:center;justify-content:center;z-index:9999;animation:fadeOut 0.8s ease-in-out 3s forwards;}.loadingSmile img{width:12vh;height:12vh;border-radius:50%;position:relative;z-index:2;animation:zoomPulse 2s ease-in-out infinite;box-shadow:0 0 30px rgba(255,215,0,0.6),0 8px 32px rgba(0,0,0,0.1),inset 0 2px 4px rgba(255,255,255,0.8);}.loadingSmile img::before{content:'';position:absolute;top:-8px;left:-8px;width:calc(100% + 16px);height:calc(100% + 16px);border:2px solid transparent;border-top:2px solid #ffd700;border-right:2px solid #ffb347;border-radius:50%;animation:spin 1.2s linear infinite;z-index:1;}.loadingSmile img::after{content:'';position:absolute;top:-15px;left:-15px;width:calc(100% + 30px);height:calc(100% + 30px);border:1px solid transparent;border-left:1px solid #ff8c00;border-bottom:1px solid #ffa500;border-radius:50%;animation:spin 2s linear infinite reverse;z-index:0;}@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}@keyframes zoomPulse{0%,100%{transform:scale(1);filter:brightness(1);box-shadow:0 0 30px rgba(255,215,0,0.6),0 8px 32px rgba(0,0,0,0.1),inset 0 2px 4px rgba(255,255,255,0.8);}50%{transform:scale(1.1);filter:brightness(1.2);box-shadow:0 0 50px rgba(255,215,0,0.8),0 12px 40px rgba(0,0,0,0.15),inset 0 3px 6px rgba(255,255,255,0.9);}}@keyframes fadeOut{0%{opacity:1;transform:scale(1);}50%{opacity:0.8;transform:scale(1.15);}100%{opacity:0;transform:scale(0.85);visibility:hidden;}}
   </style>
-  <script type="module" crossorigin src="/cartadehawka/assets/main-Zylva7M0.js"></script>
+  <script type="module" crossorigin src="/cartadehawka/assets/main-DZqVqBHp.js"></script>
   <link rel="modulepreload" crossorigin href="/cartadehawka/assets/widev-BeKaoXyd.js">
   <link rel="stylesheet" crossorigin href="/cartadehawka/assets/widev-i0e8-W1S.css">
-  <link rel="stylesheet" crossorigin href="/cartadehawka/assets/style-DtRCwxQq.css">
+  <link rel="stylesheet" crossorigin href="/cartadehawka/assets/style-D4njRL_z.css">
 </head>
 <body>
   <header class="hd">
     <h1 class="wilang">
-      <span class="wilang_titu">Language: </span>
+      <span class="wilang_titu">Idioma: </span>
     <div class="midw_v1">
         <div class="wilang-trigger">
             <div class="wilang-selected">
@@ -45,9 +45,105 @@
       <div class="loadingSmile"><img src="./smile.png" alt="Avatar" class="user-avatar"/></div>
   </div>
 
-  <footer class="foo hwb txc">
-    <p>Creado con<i class="fa fa-heart"></i>by<a class="ftx lkme" href="https://wtaype.github.io/" target="_blank">@wilder.taype</a>2025 - <span class="wty">2025</span><span class="abw tm11042025" id="101542394703517594">| Acerca del app | Actualizado  |</span><span class="login">Login</span></p>
+<!-- ...existing code... -->
+  <!-- Modales -->
+  <div id="modal-about" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <button class="modal-close" aria-label="Cerrar">&times;</button>
+      <h3>Acerca del app</h3>
+      <p>Cartas Hawka permite mostrar tu menú por hojas con precios, descripciones e íconos. Optimizado para móviles y cache local.</p>
+      <ul>
+        <li>Carga rápida con caché</li>
+        <li>Soporte multi-idioma (selector en el header)</li>
+        <li>Diseño responsive y accesible</li>
+      </ul>
+      <button class="bts modal-ok">Entendido</button>
+    </div>
+  </div>
+
+  <div id="modal-priv" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <button class="modal-close" aria-label="Cerrar">&times;</button>
+      <h3>Políticas de privacidad</h3>
+      <p>No recopilamos datos personales sin tu consentimiento. El contenido del menú se procesa y cachea en tu navegador.</p>
+      <ul>
+        <li>Sin cookies de rastreo</li>
+        <li>Control local de caché (Ctrl+Shift+R para limpiar)</li>
+        <li>Imágenes con carga diferida (lazy)</li>
+      </ul>
+      <button class="bts modal-ok">Entendido</button>
+    </div>
+  </div>
+
+  <div id="modal-recl" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <button class="modal-close" aria-label="Cerrar">&times;</button>
+      <div class="modal-header">
+        <img src="./libroReclamos.png" alt="Libro de Reclamaciones" class="recl-image">
+        <h3>Libro de reclamaciones</h3>
+      </div>
+      <form id="reclamosForm" novalidate>
+        <div class="form-grid">
+          <label>
+            Nombres y apellidos
+            <input name="nombres" type="text" required placeholder="Tu nombre completo" />
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" required placeholder="tucorreo@dominio.com" />
+          </label>
+          <label>
+            Teléfono
+            <input name="telefono" type="tel" placeholder="+51 999 999 999" />
+          </label>
+          <label>
+            N° pedido (opcional)
+            <input name="pedido" type="text" placeholder="Ej: A123" />
+          </label>
+          <label class="span-2">
+            Detalle del reclamo
+            <textarea name="detalle" required rows="4" placeholder="Describe tu reclamo..."></textarea>
+          </label>
+          <label class="span-2 chk">
+            <input type="checkbox" name="consent" required />
+            Acepto el uso de mis datos para dar seguimiento a mi reclamo.
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn-primary">Enviar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="foo">
+    <div class="foo-inner">
+      <!-- 1ra fila: Créditos -->
+      <div class="brand">
+        Creado con <i class="fa fa-heart"></i> por
+        <a class="lkme" href="https://wtaype.github.io/" target="_blank" rel="noopener">@wilder.taype</a>
+        <span class="sep">|</span> <span class="wty">2025</span>
+      </div>
+      
+      <!-- 2da fila: Enlaces -->
+      <nav class="foo-links">
+        <button class="lk about" data-modal="#modal-about" type="button">Acerca del app</button>
+        <button class="lk priv" data-modal="#modal-priv" type="button">Políticas de privacidad</button>
+        <button class="lk recl" data-modal="#modal-recl" type="button">Libro de reclamaciones</button>
+        <a class="lk login" href="/admin" rel="nofollow">Login</a>
+      </nav>
+      
+      <!-- 3ra fila: Imagen de reclamos -->
+      <div class="recl-footer">
+        <img src="./libroReclamos.png" alt="Libro de Reclamaciones" class="recl-footer-image" data-modal="#modal-recl">
+      </div>
+    </div>
   </footer>
+<!-- ...existing code... -->
+
+
+
 </body>
 </html>
 
