@@ -2,7 +2,8 @@ import $ from 'jquery';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { db } from './firebase/init.js';
 import { getDocs, collection, query, limit, where } from 'firebase/firestore';
-import { savels, getls, removels } from './widev.js';
+import { savels, getls, removels, Mensaje, Notificacion } from './widev.js';
+import { } from './wiauth.js';
 
 // Alturas sincronizadas (compacto)
 const syncHeights = () => $('.webz').each((_, el) => $(el).find('.webx').height($(el).find('.weby').outerHeight()));
@@ -136,39 +137,6 @@ $(() => {
 // API mínima
 window.hawkaMenu = { reload: cargarCartasPublico, clearCache: () => removels(CFG.C_CARTAS, CFG.C_HOJAS) };
 
-
-// ...existing code...
-$(() => {
-  // Modal helpers (ligeros)
-  const openM = sel => $(sel).addClass('show').attr('aria-hidden','false');
-  const closeM = $m => $m.removeClass('show').attr('aria-hidden','true');
-
-  $(document).on('click','[data-modal]',function(e){ e.preventDefault(); openM($(this).data('modal')); });
-  $(document).on('click','.modal-close,.modal .modal-ok,.modal .modal-cancel',function(){ closeM($(this).closest('.modal')); });
-  $(document).on('click','.modal',function(e){ if(e.target === this) closeM($(this)); });
-
-  // Envío “Libro de reclamaciones” via mailto (sin backend)
-  const EMAIL_RECL = (window.smile?.emailReclamos)||'hawka.reclamos@example.com';
-  $(document).on('submit','#reclamosForm',function(e){
-    e.preventDefault();
-    const fd = new FormData(this), d = Object.fromEntries(fd.entries());
-    if(!d.nombres || !d.email || !d.detalle || !fd.get('consent')) return alert('Completa los campos obligatorios.');
-    const body = [
-      `Nombre: ${d.nombres}`,
-      `Email: ${d.email}`,
-      `Teléfono: ${d.telefono||'-'}`,
-      `Pedido: ${d.pedido||'-'}`,
-      `Detalle:`,
-      d.detalle
-    ].join('\n');
-    const url = `mailto:${encodeURIComponent(EMAIL_RECL)}?subject=${encodeURIComponent('Reclamo - Cartas Hawka')}&body=${encodeURIComponent(body)}`;
-    window.location.href = url;
-    alert('Gracias. Tu reclamo será atendido.');
-    this.reset();
-    closeM($('#modal-recl'));
-  });
-
-  // Año dinámico en footer
-  $('.wty').text(new Date().getFullYear());
-});
-// ...existing code...
+ //Para footer y forms [START]
+$(()=>{const OMFoo=m=>$(m).addClass('show').attr('aria-hidden','false'),CMFoo=$m=>$m.removeClass('show').attr('aria-hidden','true'),WFoo=window.smile?.whatsReclamos||'51992472706';$(document).on('click','[data-foomodal]',e=>(e.preventDefault(),OMFoo($(e.currentTarget).data('foomodal')))).on('click','.foo-close,.foomodal .foo-ok,.foomodal .foo-cancel',e=>CMFoo($(e.currentTarget).closest('.foomodal'))).on('click','.foomodal',e=>{if(e.target===e.currentTarget)CMFoo($(e.currentTarget));}).on('submit','#reclamosForm',e=>{e.preventDefault();const fd=new FormData(e.currentTarget),d=Object.fromEntries(fd.entries());if(!d.nombres||!d.email||!d.detalle||!fd.get('consent'))return Mensaje('Completa los campos obligatorios.','error');const msg=`*Reclamo Hawka*\nNombre: ${d.nombres}\nEmail: ${d.email}\nTeléfono: ${d.telefono||'-'}\nPedido: ${d.pedido||'-'}\nDetalle: ${d.detalle}`;window.open(`https://wa.me/${WFoo}?text=${encodeURIComponent(msg)}`,'_blank');Notificacion('Abriendo WhatsApp...','success',2200);e.currentTarget.reset();CMFoo($('#foo-recl'));});$('.wty').text(new Date().getFullYear());});
+//Para footer y forms [END]

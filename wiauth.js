@@ -25,7 +25,7 @@ const showLogin = `
       <div class="auth-logo">
         <img src="./smile.png" alt="Smile Beneficios">
       </div>
-      <h2 class="auth-title">Wii Login</h2>
+      <h2 class="auth-title">Login</h2>
       
       <form id="loginForm" class="dfd">
         <div class="form-group">
@@ -172,7 +172,7 @@ $(function(){
 
 
   // Navegación entre modales
-  $('.login').click(() => OpenAuthM('loginModal'));
+  $('.Login').click(() => OpenAuthM('loginModal'));
   $('.registrar').click(() => OpenAuthM('registroModal'));
   $('.crearCuenta').click(()=> {OpenAuthM('registroModal');CloseAuthM('loginModal')});
   $('.conCuenta').click(()=> {OpenAuthM('loginModal');CloseAuthM('registroModal')});
