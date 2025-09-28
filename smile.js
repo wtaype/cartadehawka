@@ -5,8 +5,10 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, setDoc, getDocs, deleteDoc, collection, query, writeBatch, serverTimestamp, limit, where } from "firebase/firestore";
 import { Mensaje, Notificacion, savels, getls, removels, gosaves, getsaves, showLoading, infoo } from './widev.js';
 
+let userAuth = null; //Para guardar usuario
 onAuthStateChanged(auth, async user=>{
   if(!user) return location.href='/';
+  userAuth = user; //Guardando usuario
   try{
     const wi=getls('wiSmile');
     if(wi) return main(wi);
@@ -387,3 +389,17 @@ function main(wi){
   events(); render.all(); infoo();
   if(!state.hojas.length||!state.cartas.length) firebase.load();
 }
+
+
+// PARA GUARDAR EL TEMA
+$(document).on('click','.tema',async function(){
+  const miTema = $(this).data('tema');
+  try {
+    await setDoc(doc(db, 'configuracion', userAuth.displayName), {
+      tema: miTema,
+      actualizado: serverTimestamp()
+    }, { merge: true });
+    savels('wiTema', miTema, 72);
+    Mensaje('Tema guardado <i class="fa-solid fa-circle-check"></i>');
+  }catch(e){console.error(e)}
+});

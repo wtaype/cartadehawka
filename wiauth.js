@@ -164,12 +164,13 @@ const showRestablecer = `
 
 // PARA LOS EVENTOS 
 $(function(){
-  let midb = 'smiles';  //Para base de datos 
-  let wiAuthTm = 3000;  //Tiempo para guardar en firestore
-  let wiAuthIn = 'wiAuthIn';  //Para guardar auth en localstorage
-  let wiAuthRol = 'wiAuthRol';  //Para guardar auth en localstorage
-  let rol = 'smile' //Rol default
-
+let midb = 'smiles';  //Para base de datos 
+let miconf = 'configuracion';  //Para base de datos 
+let wiAuthTm = 3000;  //Tiempo para guardar en firestore
+let wiAuthIn = 'wiAuthIn';  //Para guardar auth en localstorage
+let wiAuthRol = 'wiAuthRol';  //Para guardar auth en localstorage
+let rol = 'smile' //Rol default
+let temaAsignado = 'Cielo' //Rol default
 
   // Navegación entre modales
   $('.Login').click(() => OpenAuthM('loginModal'));
@@ -259,6 +260,10 @@ $('#Registrar').click(async function(){
     //Trayendo valores listos y verificados
     const campos = ['regEmail', 'regUsuario', 'regNombre', 'regApellidos', 'regGenero', 'regPassword'];
     const [email, usuario, nombre, apellidos, genero, password] = campos.map(id=> $('#' + id).val().trim());
+
+    // ASIGNAR TEMA SEGÚN GÉNERO
+  const temasGenero = { masculino: ['Cielo|#0EBEFF','Paz|#29C72E'], femenino: ['Dulce|#FF5C69','Mora|#7000FF'] };
+  const pool = temasGenero[genero] || ['Paz|#29C72E','Cielo|#0EBEFF']; temaAsignado = pool[Math.floor(Math.random()*pool.length)];
     
     // REGISTRANDO EN AUTH 
     const {user} = await createUserWithEmailAndPassword(auth, email, password);
@@ -278,38 +283,48 @@ $('#Registrar').click(async function(){
       creacion: serverTimestamp(),
       uid: user.uid
     });
+    // REGISTRANDO PREFERENCIAS EN DB
+    const wiconsv = doc(db, miconf, usuario);
+    await setDoc(wiconsv,{
+      usuario, email,           
+      tema: temaAsignado, // Corregido: faltaba coma y ahora asigna tema según género
+      actualizacion: serverTimestamp()
+    });
     console.log('Registro completo en Firestore ✅' + Date());
     Mensaje('Registro completado! ✅');
 
   }catch(e){Mensaje({'auth/email-already-in-use': 'Email ya registrado', 'auth/weak-password': 'Contraseña muy débil'}[e.code] || e.message) || console.error(e);}
-  finally{savels(wiAuthIn,'wIn',24); savels(wiAuthRol,rol,24); setTimeout(()=> (accederRol(rol)), wiAuthTm);}
+  finally{savels(wiAuthIn,'wIn',24); savels(wiAuthRol,rol,24); savels('wiTema',temaAsignado,72); setTimeout(()=> (accederRol(rol)), wiAuthTm);}
 });
 
 // LOGIN CENTER APP 
 $('#Login').click(async function() {
+
   try {
     const [usuario, password] = ['#email', '#password'].map(id => $(id).val());
-    
-    let busq = null;
-    let email = usuario; //Para ingresar con usuario, actualizando a email 
-    if (!usuario.includes('@')){
-      try{
-        busq = await getDoc(doc(db, midb, usuario));
-        email = busq.exists() ? busq.data().email : null;
-      }catch(e){console.error('ebdUsuario', e); email = null;}
-    } // Convertir usuario a email si es necesario
-
-    await signInWithEmailAndPassword(auth, email, password); // Iniciando
-    savels(wiAuthIn,'wIn',24); savels(wiAuthRol, busq.data().rol, 24); accederRol(busq.data().rol);  //Actualizando seguridad
-
-  }catch(e){
+    let email = usuario, busq = null, tema = null;
+    if (!usuario.includes('@')) {
+      busq = await getDoc(doc(db, midb, usuario));
+      if (!busq.exists()) throw new Error('Usuario no encontrado');
+      email = busq.data().email;
+      try { tema = (await getDoc(doc(db, 'configuracion', usuario))).data()?.tema; } catch(e) {}
+    }
+    await signInWithEmailAndPassword(auth, email, password);
+    const rol = busq?.data()?.rol || 'smile';
+    savels(wiAuthIn,'wIn',24); savels(wiAuthRol, rol, 24);  //Para guardar el inicio sesion
+    if (tema) savels('wiTema', tema, 72); //Para guardar el tema 
+    accederRol(rol);
+  }
+  
+  catch(e){
     const errores = {
       'auth/invalid-credential': 'Contraseña incorrecta',
       'auth/invalid-email': 'Falta registrar Email',
       'auth/missing-email': 'Email o usuario no registrado'
     }; Mensaje(errores[e.code] || e.message, 'error'); console.error(e);   
-  }
+  }finally{showLoading(false)}
 });
+
 
 // RECUPERAR CENTER APP 
 $('#Recuperar').click(async function() {
