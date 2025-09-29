@@ -71,7 +71,7 @@ const hojaHTML = (num, items, headers) => {
           </div>
         </div>
       </div>
-    </div>
+    </div> 
     <div class="separador"><span class="sep-number">${num}</span></div>`;
 };
 
