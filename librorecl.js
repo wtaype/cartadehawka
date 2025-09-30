@@ -1,5 +1,7 @@
-// ...existing code...
-// (Place this script in ./librorecl.js and ensure it's referenced in the HTML)
+import $ from 'jquery';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import { Mensaje, Notificacion, savels, getls, removels, gosaves, getsaves, showLoading, infoo } from './widev.js';
+
 $(function () {
   let lang = localStorage.getItem('hawka-lang') || 'es';
   let section = 1;
