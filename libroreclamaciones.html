@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title data-es="Libro de Reclamaciones" data-en="Complaints Book">Libro de Reclamaciones</title>
+  <link rel="stylesheet" href="./estilos.css" />
+  <link rel="icon" href="./img/logo-almabonita.jpeg"/>
+    <style>
+    :root{
+  --primary:#f8cd04;
+  --primary-600:#e6b800;
+  --text:#222;
+  --muted:#666;
+  --border:#e6e6e6;
+  --bg:#fafafa;
+  --ok:#12a150;
+  --error:#c52828;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;color:var(--text);background:#fff;line-height:1.45}
+a{color:#0a66c2;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.conten-libro{max-width:900px;margin:80px auto 40px;padding:0 16px}
+.container-img{display:flex;justify-content:center;margin-bottom:16px}
+.container-img img{width:160px;height:auto;border-radius:8px}
+
+.title-libro{text-align:center;color:var(--primary);margin:8px 0 12px}
+.p-complement{color:var(--muted);text-align:justify}
+.bold{font-weight:600}
+.note{color:var(--error);margin:10px 0}
+hr{border:0;border-top:1px solid var(--border);margin:14px 0}
+
+.contact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}
+.contact-grid .social{display:flex;flex-direction:column;gap:6px}
+
+.container{margin:10px 0}
+.legal{color:#333;text-align:justify;margin:10px 0}
+.legal.strong{font-weight:700}
+
+.form-container{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+.section-header h3{margin:0 0 6px;color:#111}
+.section-header .mini{margin:0 0 10px;color:var(--muted);font-size:.9rem}
+
+.form-section{display:none}
+.form-section.active{display:block}
+
+.form-group{margin:12px 0}
+.form-row-2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.form-row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.form-label{display:block;font-weight:600;margin-bottom:6px}
+.req{color:var(--error)}
+.form-input,.form-textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:#fff;outline:none;transition:.15s border,.15s box-shadow}
+.form-input:focus,.form-textarea:focus{border-color:var(--primary-600);box-shadow:0 0 0 3px rgba(248,205,4,.25)}
+.form-textarea{min-height:120px;resize:vertical}
+
+.inline-check{display:flex;gap:10px;align-items:center}
+
+.radio-group{display:grid;gap:8px}
+.radio-option{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--border);border-radius:8px;cursor:pointer}
+.radio-option:hover{border-color:var(--primary)}
+.radio-option input{accent-color:var(--primary)}
+
+.error-message{display:none;color:#fff;background:var(--error);border-radius:6px;padding:8px 10px;margin-top:6px;font-size:.9rem}
+.error-message.show{display:block}
+
+.buttons{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+.btn{appearance:none;border:0;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer;transition:.15s transform,.15s opacity}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--primary);color:#111}
+.btn-primary:hover{background:var(--primary-600)}
+.btn-secondary{background:#e9ecef;color:#111}
+.btn-secondary:hover{opacity:.9}
+.btn-success{background:var(--ok);color:#fff}
+.btn-success:hover{filter:brightness(.95)}
+.hidden{display:none !important}
+
+.success-message{display:none;margin-top:14px;padding:12px;border:1px solid #cce7d0;background:#eaf7ee;color:#0b5d2a;border-radius:8px}
+.success-message.show{display:block}
+
+.progress{position:fixed;left:0;right:0;bottom:0;height:4px;background:#f0f0f0}
+.progress-fill{width:25%;height:100%;background:linear-gradient(90deg,var(--primary),#ffd84d)}
+
+.language-selector{position:fixed;top:12px;right:12px;z-index:1000}
+.lang-trigger{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:8px 12px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.flag-icon{width:20px;height:14px;object-fit:cover;border-radius:2px}
+.chev{font-size:12px;color:#555}
+.lang-dropdown{position:absolute;right:0;margin-top:8px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.08);padding:6px;display:none;min-width:170px}
+.lang-dropdown.show{display:block}
+.lang-option{display:flex;align-items:center;gap:8px;width:100%;background:transparent;border:0;text-align:left;padding:8px 10px;border-radius:8px;cursor:pointer}
+.lang-option:hover{background:#f7f7f7}
+
+@media (max-width:900px){
+  .conten-libro{margin-top:72px}
+}
+@media (max-width:768px){
+  .contact-grid{grid-template-columns:1fr}
+  .form-row-2{grid-template-columns:1fr}
+  .form-row-3{grid-template-columns:1fr}
+}
+```// filepath: c:\Users\wilde\Documents\MDRIVE\AMGIT\amwil\cartadehawka\estilos.css
+:root{
+  --primary:#f8cd04;
+  --primary-600:#e6b800;
+  --text:#222;
+  --muted:#666;
+  --border:#e6e6e6;
+  --bg:#fafafa;
+  --ok:#12a150;
+  --error:#c52828;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;color:var(--text);background:#fff;line-height:1.45}
+a{color:#0a66c2;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.conten-libro{max-width:900px;margin:80px auto 40px;padding:0 16px}
+.container-img{display:flex;justify-content:center;margin-bottom:16px}
+.container-img img{width:160px;height:auto;border-radius:8px}
+
+.title-libro{text-align:center;color:var(--primary);margin:8px 0 12px}
+.p-complement{color:var(--muted);text-align:justify}
+.bold{font-weight:600}
+.note{color:var(--error);margin:10px 0}
+hr{border:0;border-top:1px solid var(--border);margin:14px 0}
+
+.contact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}
+.contact-grid .social{display:flex;flex-direction:column;gap:6px}
+
+.container{margin:10px 0}
+.legal{color:#333;text-align:justify;margin:10px 0}
+.legal.strong{font-weight:700}
+
+.form-container{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+.section-header h3{margin:0 0 6px;color:#111}
+.section-header .mini{margin:0 0 10px;color:var(--muted);font-size:.9rem}
+
+.form-section{display:none}
+.form-section.active{display:block}
+
+.form-group{margin:12px 0}
+.form-row-2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.form-row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.form-label{display:block;font-weight:600;margin-bottom:6px}
+.req{color:var(--error)}
+.form-input,.form-textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:#fff;outline:none;transition:.15s border,.15s box-shadow}
+.form-input:focus,.form-textarea:focus{border-color:var(--primary-600);box-shadow:0 0 0 3px rgba(248,205,4,.25)}
+.form-textarea{min-height:120px;resize:vertical}
+
+.inline-check{display:flex;gap:10px;align-items:center}
+
+.radio-group{display:grid;gap:8px}
+.radio-option{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--border);border-radius:8px;cursor:pointer}
+.radio-option:hover{border-color:var(--primary)}
+.radio-option input{accent-color:var(--primary)}
+
+.error-message{display:none;color:#fff;background:var(--error);border-radius:6px;padding:8px 10px;margin-top:6px;font-size:.9rem}
+.error-message.show{display:block}
+
+.buttons{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+.btn{appearance:none;border:0;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer;transition:.15s transform,.15s opacity}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--primary);color:#111}
+.btn-primary:hover{background:var(--primary-600)}
+.btn-secondary{background:#e9ecef;color:#111}
+.btn-secondary:hover{opacity:.9}
+.btn-success{background:var(--ok);color:#fff}
+.btn-success:hover{filter:brightness(.95)}
+.hidden{display:none !important}
+
+.success-message{display:none;margin-top:14px;padding:12px;border:1px solid #cce7d0;background:#eaf7ee;color:#0b5d2a;border-radius:8px}
+.success-message.show{display:block}
+
+.progress{position:fixed;left:0;right:0;bottom:0;height:4px;background:#f0f0f0}
+.progress-fill{width:25%;height:100%;background:linear-gradient(90deg,var(--primary),#ffd84d)}
+
+.language-selector{position:fixed;top:12px;right:12px;z-index:1000}
+.lang-trigger{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:8px 12px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.flag-icon{width:20px;height:14px;object-fit:cover;border-radius:2px}
+.chev{font-size:12px;color:#555}
+.lang-dropdown{position:absolute;right:0;margin-top:8px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.08);padding:6px;display:none;min-width:170px}
+.lang-dropdown.show{display:block}
+.lang-option{display:flex;align-items:center;gap:8px;width:100%;background:transparent;border:0;text-align:left;padding:8px 10px;border-radius:8px;cursor:pointer}
+.lang-option:hover{background:#f7f7f7}
+
+@media (max-width:900px){
+  .conten-libro{margin-top:72px}
+}
+@media (max-width:768px){
+  .contact-grid{grid-template-columns:1fr}
+  .form-row-2{grid-template-columns:1fr}
+  .form-row-3{grid-template-columns:1fr}
+}
+  </style>
+</head>
+<body>
+  <!-- Selector de idioma -->
+  <div class="language-selector">
+    <button id="langTrigger" class="lang-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+      <img id="currentFlag" class="flag-icon" alt="Español"
+           src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 341'%3E%3Cpath fill='%23c41e3a' d='M0 0h512v341H0z'/%3E%3Cpath fill='%23ffc400' d='M0 85.25h512v170.5H0z'/%3E%3C/svg%3E"/>
+      <span id="currentLang">Español</span>
+      <span class="chev">▾</span>
+    </button>
+    <div id="langDropdown" class="lang-dropdown" role="menu" aria-hidden="true">
+      <button class="lang-option" data-lang="es" type="button">
+        <img class="flag-icon" alt="Español"
+             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 341'%3E%3Cpath fill='%23c41e3a' d='M0 0h512v341H0z'/%3E%3Cpath fill='%23ffc400' d='M0 85.25h512v170.5H0z'/%3E%3C/svg%3E"/>
+        <span>Español</span>
+      </button>
+      <button class="lang-option" data-lang="en" type="button">
+        <img class="flag-icon" alt="English"
+             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 341'%3E%3Cpath fill='%23b22234' d='M0 0h512v341H0z'/%3E%3Cpath stroke='%23fff' stroke-width='28' d='M0 38h512M0 76h512M0 114h512M0 152h512M0 190h512M0 228h512M0 266h512M0 304h512'/%3E%3Cpath fill='%233c3b6e' d='M0 0h205v190H0z'/%3E%3C/svg%3E"/>
+        <span>English</span>
+      </button>
+    </div>
+  </div>
+
+  <main class="conten-libro">
+    <!-- Logo -->
+    <div class="container-img">
+      <img src="hdlogo.png" alt="Hawka Logo"/>
+    </div>
+
+    <!-- Intro -->
+    <section class="container conten-complement">
+      <h2 class="title-libro"
+          data-es="Libro de Reclamaciones Virtual"
+          data-en="Virtual Complaints Book">Libro de Reclamaciones Virtual</h2>
+
+      <p class="p-complement"
+         data-es="En Cafetería Hawka estamos siempre dispuestos a ayudarte a resolver cualquier inconveniente. Puedes contactarnos directamente para cualquier duda, problema o reclamo. Siempre velaremos por la satisfacción de nuestros clientes."
+         data-en="At Cafetería Hawka we are always ready to help you resolve any issue. You can contact us directly for any questions, problems, or complaints. We always strive for our customers' satisfaction.">
+         En Cafetería Hawka estamos siempre dispuestos a ayudarte a resolver cualquier inconveniente. Puedes contactarnos directamente para cualquier duda, problema o reclamo. Siempre velaremos por la satisfacción de nuestros clientes.
+      </p>
+
+      <div class="contact-grid">
+        <div>
+          <p class="bold" data-es="Teléfono / WhatsApp" data-en="Phone / WhatsApp">Teléfono / WhatsApp</p>
+          <p>+51 992 472 706</p>
+        </div>
+        <div>
+          <p class="bold">Email</p>
+          <a href="mailto:curasileonc@gmail.com">curasileonc@gmail.com</a>
+        </div>
+        <div>
+          <p class="bold" data-es="Ubicación" data-en="Location">Ubicación</p>
+          <p>Laguna Huacachina, Ica</p>
+        </div>
+      </div>
+
+      <div class="container">
+        <p class="bold" data-es="Redes Sociales" data-en="Social Media">Redes Sociales</p>
+        <a target="_blank" href="#" aria-label="Facebook">Facebook</a><br/>
+        <a target="_blank" href="#" aria-label="Instagram">Instagram</a>
+      </div>
+
+      <p class="note" data-es="* Indica que la pregunta es obligatoria" data-en="* Indicates a required question">* Indica que la pregunta es obligatoria</p>
+      <hr/>
+    </section>
+
+    <!-- Empresa -->
+    <section class="container">
+      <h3 class="title-libro" data-es="Información de la Empresa" data-en="Company Information">Información de la Empresa</h3>
+      <p><strong>CAFETERÍA HAWKA</strong></p>
+      <p><strong>RUC: 20671051627</strong></p>
+      <p class="legal"
+         data-es="De acuerdo a lo establecido en el Código de Protección y Defensa del Consumidor, Cafetería Hawka con RUC 20671051627 y dirección en Laguna Huacachina, Ica; cuenta con un Libro de Reclamaciones Virtual a su disposición. Al ingresar sus datos en el Libro de Reclamaciones usted está aceptando el tratamiento de sus datos personales para la solución de su reclamo."
+         data-en="In accordance with the Consumer Protection Code, Cafetería Hawka (RUC 20671051627) with address at Laguna Huacachina, Ica, has a Virtual Complaints Book available. By entering your data, you accept the processing of your personal data to resolve your complaint.">
+         De acuerdo a lo establecido en el Código de Protección y Defensa del Consumidor, Cafetería Hawka con RUC 20671051627 y dirección en Laguna Huacachina, Ica; cuenta con un Libro de Reclamaciones Virtual a su disposición. Al ingresar sus datos en el Libro de Reclamaciones usted está aceptando el tratamiento de sus datos personales para la solución de su reclamo.
+      </p>
+      <p class="legal strong"
+         data-es="*El proveedor (CAFETERÍA HAWKA) le deberá dar respuesta a su Reclamo o Queja en un plazo no mayor de quince (15) días hábiles."
+         data-en="*The provider (CAFETERÍA HAWKA) must respond to your Complaint or Claim within fifteen (15) business days.">
+         *El proveedor (CAFETERÍA HAWKA) le deberá dar respuesta a su Reclamo o Queja en un plazo no mayor de quince (15) días hábiles.
+      </p>
+    </section>
+
+    <!-- Formulario -->
+    <form id="bookForm" class="form-container" novalidate>
+      <input type="hidden" id="purchaseDate" name="purchaseDate"/>
+
+      <!-- Sección 1 -->
+      <section id="section1" class="form-section active">
+        <div class="section-header">
+          <h3 data-es="1. IDENTIFICACIÓN DEL CONSUMIDOR RECLAMANTE"
+              data-en="1. COMPLAINANT IDENTIFICATION">1. IDENTIFICACIÓN DEL CONSUMIDOR RECLAMANTE</h3>
+        </div>
+
+        <div class="form-group inline-check">
+          <input type="checkbox" id="minorAge"/>
+          <label for="minorAge" data-es="¿Es menor de edad?" data-en="Are you a minor?">¿Es menor de edad?</label>
+        </div>
+
+        <div class="form-group">
+          <label for="fullName" class="form-label">
+            <span data-es="Nombre Completo" data-en="Full Name">Nombre Completo</span> <span class="req">*</span>
+          </label>
+          <input id="fullName" class="form-input" type="text" required
+                 data-es-placeholder="Ingrese su nombre completo" data-en-placeholder="Enter your full name"
+                 placeholder="Ingrese su nombre completo"/>
+          <div class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="documentNumber" class="form-label">DNI / CE <span class="req">*</span></label>
+          <input id="documentNumber" class="form-input" type="text" required
+                 inputmode="text" autocomplete="off"
+                 data-es-placeholder="Número de documento" data-en-placeholder="Document number"
+                 placeholder="Número de documento"
+                 title="DNI (8 dígitos) o CE (9-20 alfanumérico)"/>
+          <div class="error-message"></div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="email" class="form-label" data-es="Correo Electrónico" data-en="Email">Correo Electrónico</label>
+            <input id="email" class="form-input" type="email"
+                   data-es-placeholder="ejemplo@correo.com" data-en-placeholder="name@example.com"
+                   placeholder="ejemplo@correo.com"/>
+            <div class="error-message"></div>
+          </div>
+          <div class="form-group">
+            <label for="phone" class="form-label" data-es="Teléfono" data-en="Phone">Teléfono</label>
+            <input id="phone" class="form-input" type="tel"
+                   data-es-placeholder="Número de teléfono" data-en-placeholder="Phone number"
+                   placeholder="Número de teléfono"/>
+            <div class="error-message"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="address" class="form-label" data-es="Dirección Completa" data-en="Full Address">Dirección Completa</label>
+          <input id="address" class="form-input" type="text"
+                 data-es-placeholder="Dirección completa" data-en-placeholder="Full address"
+                 placeholder="Dirección completa"/>
+          <div class="error-message"></div>
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label for="district" class="form-label" data-es="Distrito" data-en="District">Distrito</label>
+            <input id="district" class="form-input" type="text"
+                   data-es-placeholder="Distrito" data-en-placeholder="District"
+                   placeholder="Distrito"/>
+          </div>
+          <div class="form-group">
+            <label for="province" class="form-label" data-es="Provincia" data-en="Province">Provincia</label>
+            <input id="province" class="form-input" type="text"
+                   data-es-placeholder="Provincia" data-en-placeholder="Province"
+                   placeholder="Provincia"/>
+          </div>
+          <div class="form-group">
+            <label for="department" class="form-label" data-es="Departamento" data-en="Department">Departamento</label>
+            <input id="department" class="form-input" type="text"
+                   data-es-placeholder="Departamento" data-en-placeholder="Department"
+                   placeholder="Departamento"/>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección 2 -->
+      <section id="section2" class="form-section">
+        <div class="section-header">
+          <h3 data-es="2. PRODUCTO / SERVICIO" data-en="2. PRODUCT / SERVICE">2. PRODUCTO / SERVICIO</h3>
+        </div>
+
+        <div class="form-group" id="group-purchaseChannel">
+          <label class="form-label" data-es="Canal de Compra" data-en="Purchase Channel">Canal de Compra</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="purchaseChannel" value="Web" id="channelWeb"/>
+              <span>Web</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="purchaseChannel" value="Módulo Jockey Plaza" id="channelJockey"/>
+              <span>Módulo Jockey Plaza</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="purchaseChannel" value="Instagram o WhatsApp" id="channelSocial"/>
+              <span>Instagram o WhatsApp</span>
+            </label>
+          </div>
+          <div class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="productService" class="form-label" data-es="Producto Adquirido" data-en="Product Acquired">Producto Adquirido</label>
+          <input id="productService" class="form-input" type="text"
+                 data-es-placeholder="Tu respuesta" data-en-placeholder="Your answer"
+                 placeholder="Tu respuesta"/>
+          <div class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="cost" class="form-label" data-es="Costo del Producto (S/)" data-en="Product Cost (S/)">Costo del Producto (S/)</label>
+          <input id="cost" class="form-input" type="number" step="0.01" min="0"
+                 data-es-placeholder="Solo números" data-en-placeholder="Numbers only"
+                 placeholder="Solo números"/>
+          <div class="error-message"></div>
+        </div>
+      </section>
+
+      <!-- Sección 3 -->
+      <section id="section3" class="form-section">
+        <div class="section-header">
+          <h3 data-es="3. DETALLE" data-en="3. DETAILS">3. DETALLE</h3>
+        </div>
+
+        <div class="form-group" id="group-complaintType">
+          <label class="form-label" data-es="Reclamo o Queja" data-en="Complaint or Claim">Reclamo o Queja</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="complaintType" value="Reclamo: Disconformidad relacionada a los productos o servicios" id="typeClaim"/>
+              <span data-es="Reclamo: Disconformidad relacionada a los productos o servicios"
+                    data-en="Claim: Nonconformity related to products or services">
+                Reclamo: Disconformidad relacionada a los productos o servicios
+              </span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="complaintType" value="Queja: Disconformidad no relacionada a los productos o servicios; o malestar respecto a la atención" id="typeComplaint"/>
+              <span data-es="Queja: Disconformidad no relacionada a los productos o servicios; o malestar respecto a la atención"
+                    data-en="Complaint: Nonconformity not related to products or services; or discomfort with customer service">
+                Queja: Disconformidad no relacionada a los productos o servicios; o malestar respecto a la atención
+              </span>
+            </label>
+          </div>
+          <div class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="complaintDetail" class="form-label"
+                 data-es="Detalle de la reclamación o queja" data-en="Details of the complaint or claim">Detalle de la reclamación o queja</label>
+          <textarea id="complaintDetail" class="form-textarea" rows="5"
+                    data-es-placeholder="Describe tu caso" data-en-placeholder="Describe your case"
+                    placeholder="Describe tu caso"></textarea>
+          <div class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="consumerRequest" class="form-label"
+                 data-es="Pedido concreto del consumidor" data-en="Consumer's specific request">Pedido concreto del consumidor</label>
+          <input id="consumerRequest" class="form-input" type="text"
+                 data-es-placeholder="Tu respuesta" data-en-placeholder="Your answer"
+                 placeholder="Tu respuesta"/>
+          <div class="error-message"></div>
+        </div>
+      </section>
+
+      <!-- Sección 4 -->
+      <section id="section4" class="form-section">
+        <div class="section-header">
+          <h3 data-es="4. CONFIRMACIÓN" data-en="4. CONFIRMATION">4. CONFIRMACIÓN</h3>
+        </div>
+
+        <div class="form-group inline-check">
+          <input type="checkbox" id="acceptTerms"/>
+          <label for="acceptTerms"
+                 data-es="Acepto los Términos y la Política de Privacidad"
+                 data-en="I accept the Terms and Privacy Policy">Acepto los Términos y la Política de Privacidad</label>
+          <div class="error-message"></div>
+        </div>
+      </section>
+
+      <!-- Botones -->
+      <div class="buttons">
+        <button id="prevBtn" type="button" class="btn btn-secondary hidden" data-es="Atrás" data-en="Back">Atrás</button>
+        <button id="nextBtn" type="button" class="btn btn-primary" data-es="Siguiente" data-en="Next">Siguiente</button>
+        <button id="submitBtn" type="button" class="btn btn-success hidden" data-es="Enviar" data-en="Submit">Enviar</button>
+      </div>
+
+      <!-- Éxito -->
+      <div id="successMessage" class="success-message" aria-live="polite"></div>
+    </form>
+  </main>
+
+  <!-- Progreso (simple) -->
+  <div class="progress">
+    <div id="progressFill" class="progress-fill"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="./librorecl.js"></script>
+</body>
+</html>
