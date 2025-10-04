@@ -11,12 +11,22 @@ const debounced = (() => { let t; return () => (clearTimeout(t), t = setTimeout(
 $(debounced); $(window).on('load resize orientationchange', debounced);
 
 // Idiomas (toggle)
-$(() => {
-  const $w = $('.midw_v1'), $c = $w.find('.wilang-content');
-  $w.on('click', '.wilang-trigger', e => (e.stopPropagation(), $c.toggleClass('show'), $w.find('.fa-chevron-down').toggleClass('rotated')))
-    .on('click', '.wilang-item', function(){ $c.removeClass('show'); setTimeout(()=>location.href=$(this).data('url'),200); });
-  $(document).on('click', () => ($c.removeClass('show'), $w.find('.fa-chevron-down').removeClass('rotated')));
-});
+const initLangSelector = () => $(document).off('.wilang').on('click.wilang', '.wilang-trigger', e => {
+  e.stopPropagation();
+  const $w = $(e.currentTarget).closest('.midw_v1'), $c = $w.find('.wilang-content');
+  $c.toggleClass('show');
+  $w.find('.fa-chevron-down').toggleClass('rotated');
+}).on('click.wilang', '.wilang-item', function(e){
+  e.stopPropagation();
+  $('.wilang-content').removeClass('show');
+  $('.fa-chevron-down').removeClass('rotated');
+  setTimeout(() => location.href = $(this).data('url'), 200);
+}).on('click.wilang', e => {
+  if (!$(e.target).closest('.midw_v1').length) {
+    $('.wilang-content').removeClass('show');
+    $('.fa-chevron-down').removeClass('rotated');
+  }
+}); $(() => initLangSelector());
 
 // Config desde smile.js (opcional)
 const SM = window.smile || {};
