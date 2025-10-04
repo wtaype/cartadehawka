@@ -840,4 +840,57 @@ body {
   .foo-btn{ min-height:38px; font-size:13px; padding:9px 14px; }
 }
 
-/* ...existing code... */
+@media (max-width:1000px){
+:root{
+--fz_s1:.92vw;
+--fz_s2:.97vw;
+--fz_s3:1.2vw;
+--fz_s4:1.25vw;
+--fz_m:1.3vw;
+--fz_m1:.85vw;
+--fz_m2:.9vw;
+--fz_m3:.95vw;
+--fz_l:1.0vw;
+--fz_l1:1.07vw;
+--fz_l2:1.15vw;
+--fz_l3:1.2vw;
+--fz_t1:1.6vw;
+--fz_t2:1.75vw;
+ }
+}
+@media (max-width:890px){
+ :root{
+--fz_s1:.99vw;
+--fz_s2:1vw;
+--fz_s3:1.3vw;
+--fz_s4:1.35vw;
+--fz_m:1.7vw;
+--fz_m1:1.9vw;
+--fz_m2:1.95vw;
+--fz_m3:1.98vw;
+--fz_l:2.1vw;
+--fz_l1:2.07vw;
+--fz_l2:2.15vw;
+--fz_l3:2.2vw;
+--fz_t1:2.6vw;
+--fz_t2:2.75vw;
+ }
+}
+@media (max-width:770px){
+  :root{
+    --fz_s1:1.12vw; --fz_s2:1.27vw; --fz_s3:1.32vw; --fz_s4:1.47vw;
+    --fz_m:1.50vw;  --fz_m1:1.55vw; --fz_m2:1.60vw; --fz_m3:1.65vw;
+    --fz_l:1.70vw;  --fz_l1:1.75vw; --fz_l2:1.80vw; --fz_l3:1.85vw;
+    --fz_t1:2.30vw; --fz_t2:3.30vw;
+  }
+}
+
+@media (max-width:570px){
+  :root{
+    --fz_s1:2.12vw; --fz_s2:2.27vw; --fz_s3:2.32vw; --fz_s4:2.47vw;
+    --fz_m:2.50vw;  --fz_m1:2.55vw; --fz_m2:2.60vw; --fz_m3:2.65vw;
+    --fz_l:2.70vw;  --fz_l1:2.75vw; --fz_l2:2.80vw; --fz_l3:2.85vw;
+    --fz_t1:3.30vw; --fz_t2:4.30vw;
+  }
+
+}
