@@ -249,56 +249,56 @@ let temaAsignado = 'Cielo' //Rol default
     }
   }); // Validación para email disponible con firestore
 
-$('#Registrar').click(async function(){
-  const todasValidaciones = [[usuarioListo, $('#regUsuario')[0], 'Usuario no disponible'], [emailListo, $('#regEmail')[0], 'Email no disponible'],
-    ...Object.entries(validacionesRegistro).map(([id, [tis, validado]]) => {
-      const campo = $(`#${id}`), vl = tis(campo.val()), result = validado(vl);
-      return [result === true, campo[0], result !== true ? result : ''];
-  })]; // Validando las entradas
-  for (const [listo, campo, mensaje] of todasValidaciones) {
-    if (!listo && mensaje && (witip(campo, mensaje, 'error'), campo.focus(), true)) return;
-  } // Validando las entradas con mensaje para registrar
+// $('#Registrar').click(async function(){
+//   const todasValidaciones = [[usuarioListo, $('#regUsuario')[0], 'Usuario no disponible'], [emailListo, $('#regEmail')[0], 'Email no disponible'],
+//     ...Object.entries(validacionesRegistro).map(([id, [tis, validado]]) => {
+//       const campo = $(`#${id}`), vl = tis(campo.val()), result = validado(vl);
+//       return [result === true, campo[0], result !== true ? result : ''];
+//   })]; // Validando las entradas
+//   for (const [listo, campo, mensaje] of todasValidaciones) {
+//     if (!listo && mensaje && (witip(campo, mensaje, 'error'), campo.focus(), true)) return;
+//   } // Validando las entradas con mensaje para registrar
 
-  try {
-    //Trayendo valores listos y verificados
-    const campos = ['regEmail', 'regUsuario', 'regNombre', 'regApellidos', 'regGenero', 'regPassword'];
-    const [email, usuario, nombre, apellidos, genero, password] = campos.map(id=> $('#' + id).val().trim());
+//   try {
+//     //Trayendo valores listos y verificados
+//     const campos = ['regEmail', 'regUsuario', 'regNombre', 'regApellidos', 'regGenero', 'regPassword'];
+//     const [email, usuario, nombre, apellidos, genero, password] = campos.map(id=> $('#' + id).val().trim());
 
-    // ASIGNAR TEMA SEGÚN GÉNERO
-  const temasGenero = { masculino: ['Cielo|#0EBEFF','Paz|#29C72E'], femenino: ['Dulce|#FF5C69','Mora|#7000FF'] };
-  const pool = temasGenero[genero] || ['Paz|#29C72E','Cielo|#0EBEFF']; temaAsignado = pool[Math.floor(Math.random()*pool.length)];
+//     // ASIGNAR TEMA SEGÚN GÉNERO
+//   const temasGenero = { masculino: ['Cielo|#0EBEFF','Paz|#29C72E'], femenino: ['Dulce|#FF5C69','Mora|#7000FF'] };
+//   const pool = temasGenero[genero] || ['Paz|#29C72E','Cielo|#0EBEFF']; temaAsignado = pool[Math.floor(Math.random()*pool.length)];
     
-    // REGISTRANDO EN AUTH 
-    const {user} = await createUserWithEmailAndPassword(auth, email, password);
-    await Promise.all([updateProfile(user, { displayName: usuario}), sendEmailVerification(user)]); 
-    console.log('Registro completo en Auth ✅' + Date());
+//     // REGISTRANDO EN AUTH 
+//     const {user} = await createUserWithEmailAndPassword(auth, email, password);
+//     await Promise.all([updateProfile(user, { displayName: usuario}), sendEmailVerification(user)]); 
+//     console.log('Registro completo en Auth ✅' + Date());
     
-    // REGISTRANDO EN FIRESTORE 
-    const wisave = doc(db, midb, usuario);
-    await setDoc(wisave,{
-      usuario,     
-      email,         
-      nombre,     
-      apellidos,  
-      genero,
-      rol,    
-      fechaNacimiento: fechaLocal($('#regFechaNacimiento').val()),
-      creacion: serverTimestamp(),
-      uid: user.uid
-    });
-    // REGISTRANDO PREFERENCIAS EN DB
-    const wiconsv = doc(db, miconf, usuario);
-    await setDoc(wiconsv,{
-      usuario, email,           
-      tema: temaAsignado, // Corregido: faltaba coma y ahora asigna tema según género
-      actualizacion: serverTimestamp()
-    });
-    console.log('Registro completo en Firestore ✅' + Date());
-    Mensaje('Registro completado! ✅');
+//     // REGISTRANDO EN FIRESTORE 
+//     const wisave = doc(db, midb, usuario);
+//     await setDoc(wisave,{
+//       usuario,     
+//       email,         
+//       nombre,     
+//       apellidos,  
+//       genero,
+//       rol,    
+//       fechaNacimiento: fechaLocal($('#regFechaNacimiento').val()),
+//       creacion: serverTimestamp(),
+//       uid: user.uid
+//     });
+//     // REGISTRANDO PREFERENCIAS EN DB
+//     const wiconsv = doc(db, miconf, usuario);
+//     await setDoc(wiconsv,{
+//       usuario, email,           
+//       tema: temaAsignado, // Corregido: faltaba coma y ahora asigna tema según género
+//       actualizacion: serverTimestamp()
+//     });
+//     console.log('Registro completo en Firestore ✅' + Date());
+//     Mensaje('Registro completado! ✅');
 
-  }catch(e){Mensaje({'auth/email-already-in-use': 'Email ya registrado', 'auth/weak-password': 'Contraseña muy débil'}[e.code] || e.message) || console.error(e);}
-  finally{savels(wiAuthIn,'wIn',24); savels(wiAuthRol,rol,24); savels('wiTema',temaAsignado,72); setTimeout(()=> (accederRol(rol)), wiAuthTm);}
-});
+//   }catch(e){Mensaje({'auth/email-already-in-use': 'Email ya registrado', 'auth/weak-password': 'Contraseña muy débil'}[e.code] || e.message) || console.error(e);}
+//   finally{savels(wiAuthIn,'wIn',24); savels(wiAuthRol,rol,24); savels('wiTema',temaAsignado,72); setTimeout(()=> (accederRol(rol)), wiAuthTm);}
+// });
 
 // LOGIN CENTER APP 
 $('#Login').click(async function() {
