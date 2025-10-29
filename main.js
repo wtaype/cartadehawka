@@ -74,11 +74,12 @@ const hojaHTML = (num, items, headers) => {
         <div class="menu-column">
           <header class="menu-header">
             <h2 class="menu-category"><i class="fas ${iconH}"></i> ${h.titulo||`Hoja ${num}`}</h2>
-            ${note}
+            
           </header>
           <div class="menu-content">
             ${items.length ? items.map(itemHTML).join('') : '<p class="no-items">No hay elementos disponibles</p>'}
           </div>
+         ${note}
         </div>
       </div>
     </div> 
