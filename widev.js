@@ -1,6 +1,13 @@
 import $ from 'jquery'; 
 
-
+export const accederRol = (rol) => {
+  const rutas = {
+    'smiletop': 'smiletop.html',
+    'smile': 'smile.html'
+  };
+  const destino = rutas[rol] || 'smile.html';
+  window.location.href = new URL(destino, window.location.href).toString();
+};
 // ==============================
 // FUNCIONES DE TEMAS CON jQuery
 // ==============================
@@ -57,16 +64,6 @@ export const Saludar = () => {
     } else {
         return "Buenas noches, ";
     }
-}; 
-
-// AccederRol
-// export const accederRol = (rol) => {
-//   window.location.href = { smiletop: '/smiletop.html' }[rol] || '/smile.html';
-// };
-
-export const accederRol = (rol) => {
-  const to = rol === 'smiletop' ? 'smiletop.html' : 'smile.html';
-  window.location.href = new URL(to, window.location.href).toString();
 }; 
 
 // RIGHT NOTIFICATIONS WITH X 
