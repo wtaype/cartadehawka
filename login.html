@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f8cd04">
+  <title>Coffee Hawka - Login</title>
+  <link rel="icon" href="/cartadehawka/logo.png" />
+  <script type="module" crossorigin src="/cartadehawka/assets/login-CP2Ggo1Y.js"></script>
+  <link rel="modulepreload" crossorigin href="/cartadehawka/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/cartadehawka/assets/widev-ClXCCnou.js">
+  <link rel="modulepreload" crossorigin href="/cartadehawka/assets/init-ckCATEbZ.js">
+  <link rel="stylesheet" crossorigin href="/cartadehawka/assets/widev-i0e8-W1S.css">
+  <link rel="stylesheet" crossorigin href="/cartadehawka/assets/login-BQd3alUO.css">
+</head>
+<body>
+
+  <div class="container">
+    <!-- LOGIN FORM -->
+    <div class="form-container login-form active">
+      <button class="close-btn" onclick="window.location.href='index.html'">&times;</button>
+      <div class="logo">
+        <img src="./smile.png" alt="Smile Beneficios">
+      </div>
+      <h2 class="form-title">Iniciar <span>Sesión</span></h2>
+      
+      <form id="loginForm">
+        <div class="input-group">
+          <i class="fas fa-envelope input-icon left"></i>
+          <input type="text" id="email" class="input-field" placeholder="Correo o usuario" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-lock input-icon left"></i>
+          <input type="password" id="password" class="input-field" placeholder="Contraseña" required>
+          <button type="button" class="toggle-password" data-target="password">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        <div class="checkbox-container">
+          <input type="checkbox" id="rememberMe">
+          <label for="rememberMe">Recordar mis datos</label>
+        </div>
+        <button type="button" id="Login" class="btn">Iniciar Sesión</button>
+      </form>
+      
+      <div class="form-footer">
+        <a href="#" class="olvidastePass"><i class="fas fa-key"></i> ¿Olvidaste tu contraseña?</a>
+        <a href="#" class="crearCuenta" style="display:none;"><i class="fas fa-user-plus"></i> Crear cuenta</a>
+      </div>
+    </div>
+
+    <!-- REGISTRO FORM -->
+    <div class="form-container registro-form">
+      <button class="close-btn" onclick="window.location.href='index.html'">&times;</button>
+      <div class="logo">
+        <img src="./smile.png" alt="Smile Beneficios">
+      </div>
+      <h2 class="form-title">Crear <span>Cuenta</span></h2>
+      
+      <form id="registroForm">
+        <div class="input-group">
+          <i class="fas fa-envelope input-icon left"></i>
+          <input type="email" id="regEmail" class="input-field" placeholder="Correo electrónico" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-user input-icon left"></i>
+          <input type="text" id="regUsuario" class="input-field" placeholder="Crear usuario" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-user-tie input-icon left"></i>
+          <input type="text" id="regNombre" class="input-field" placeholder="Nombre" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-user-tie input-icon left"></i>
+          <input type="text" id="regApellidos" class="input-field" placeholder="Apellidos" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-cake-candles input-icon left"></i>
+          <input type="date" id="regFechaNacimiento" class="input-field date-field" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-venus-mars input-icon left"></i>
+          <select id="regGenero" class="input-field" required>
+            <option value="femenino">Femenino</option>
+            <option value="masculino">Masculino</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-lock input-icon left"></i>
+          <input type="password" id="regPassword" class="input-field" placeholder="Contraseña" required>
+          <button type="button" class="toggle-password" data-target="regPassword">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-lock input-icon left"></i>
+          <input type="password" id="regPassword1" class="input-field" placeholder="Confirmar Contraseña" required>
+          <button type="button" class="toggle-password" data-target="regPassword1">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        <button type="button" id="Registrar" class="btn">Registrarme</button>
+      </form>
+      
+      <div class="form-footer">
+        <a href="#" class="conCuenta"><i class="fas fa-arrow-left"></i> Ya tengo cuenta</a>
+      </div>
+    </div>
+
+    <!-- RECOVERY FORM -->
+    <div class="form-container recovery-form">
+      <button class="close-btn" onclick="window.location.href='index.html'">&times;</button>
+      <div class="logo">
+        <img src="./smile.png" alt="Smile Beneficios">
+      </div>
+      <h2 class="form-title">Restablecer <span>Contraseña</span></h2>
+      
+      <form id="recuperarForm">
+        <p class="uptx">Ingresa tu correo o usuario:</p>
+        <div class="input-group">
+          <i class="fas fa-envelope input-icon left"></i>
+          <input type="text" id="recEmail" class="input-field" placeholder="Correo o usuario" required>
+        </div>
+        <p class="uptx">Valida tu fecha de nacimiento:</p>
+        <div class="input-group">
+          <i class="fas fa-cake-candles input-icon left"></i>
+          <input type="date" id="recFechaNacimiento" class="input-field date-field" required>
+        </div>
+        <button type="button" id="Recuperar" class="btn">Restablecer Contraseña</button>
+      </form>
+      
+      <div class="form-footer">
+        <a href="#" class="volverLogin"><i class="fas fa-arrow-left"></i> Volver a Inicio</a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
